@@ -9,12 +9,20 @@ export default class extends Phaser.Sprite {
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.body.drag.set(100)
     this.body.maxVelocity.set(200)
-
   }
 
   update () {
-    //this.angle += 15
-      //this.x = Math.sin(this.angle)*100;
-      //this.y = Math.cos(this.angle)*100;
+    var outOfWorld =  (
+      this.position.x > this.world.sizeX ||
+      this.position.y > this.world.sizeY ||
+      this.position.x < 0 ||
+      this.position.Y < 0);
+
+      if (outOfWorld)
+      {
+        console.log("Destroying asteroid");
+        this.destroy();
+        console.log("Asteroid destroyed");
+      }
   }
 }
