@@ -9,6 +9,7 @@ export default class extends Phaser.Sprite {
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.body.drag.set(100)
     this.body.maxVelocity.set(200)
+
   }
 
   update () {

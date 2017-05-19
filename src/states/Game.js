@@ -21,16 +21,25 @@ export default class extends Phaser.State {
       asset: 'ship'
     })
 
-    this.asteroid = new Asteroid({
-      game: this,
-      x: this.world.centerX,
-      y: this.world.centerY,
-      asset: 'asteroid'
-    })
-
     this.game.add.existing(this.player);
-    this.game.add.existing(this.asteroid);
+    //this.game.add.existing(this.asteroid);
   }
+  update() {
+    var asteroidRandom = Math.random();
+    if (asteroidRandom > 0.9) {
+      var xRandom = Math.random();
+      var yRandom = Math.random();
+      var newAsteroid = new Asteroid({
+          game: this,
+          x: this.world.centerX - 50 + (500 * xRandom),
+          y: this.world.centerY- 50 + (100 * yRandom),
+          asset: 'asteroid'
+        })
+      newAsteroid.angle = (xRandom + yRandom) * 20;
+      this.game.add.existing(newAsteroid);
+    }
+  }
+
 
   render () {
     if (__DEV__) {
