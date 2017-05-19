@@ -1,5 +1,7 @@
 import Phaser from 'phaser'
 
+const movementSpeed = 500
+
 export default class extends Phaser.Sprite {
   constructor ({ game, x, y, asset }) {
     super(game, x, y, asset)
@@ -8,12 +10,12 @@ export default class extends Phaser.Sprite {
     // Set up the physics for this ship.
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.body.drag.set(100)
-    this.body.maxVelocity.set(200)
+    this.body.maxVelocity.set(movementSpeed)
   }
 
   update () {
     if (game.cursors.up.isDown) {
-      game.physics.arcade.accelerationFromRotation(this.rotation, 2000, this.body.acceleration)
+      game.physics.arcade.accelerationFromRotation(this.rotation, movementSpeed, this.body.acceleration)
     } else {
       this.body.acceleration.set(0)
     }
