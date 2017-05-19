@@ -26,7 +26,7 @@ export default class extends Phaser.State {
   }
   update() {
     var asteroidRandom = Math.random();
-    if (asteroidRandom > 0.9) {
+    if (asteroidRandom > 0.99) {
       var xRandom = Math.random();
       var yRandom = Math.random();
       var newAsteroid = new Asteroid({
@@ -35,7 +35,6 @@ export default class extends Phaser.State {
           y: this.world.centerY- 50 + (100 * yRandom),
           asset: 'asteroid'
         })
-      newAsteroid.angle = (xRandom + yRandom) * 20;
       this.game.add.existing(newAsteroid);
     }
   }
