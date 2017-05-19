@@ -16,6 +16,8 @@ export default class extends Phaser.Sprite {
   update () {
     if (game.cursors.up.isDown) {
       game.physics.arcade.accelerationFromRotation(this.rotation, movementSpeed, this.body.acceleration)
+    } else if (game.cursors.down.isDown) {
+      game.physics.arcade.accelerationFromRotation(this.rotation, -movementSpeed, this.body.acceleration)
     } else {
       this.body.acceleration.set(0)
     }
