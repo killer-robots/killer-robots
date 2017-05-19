@@ -15,6 +15,9 @@ export default class extends Phaser.Sprite {
   update () {
     //this.angle += 15
       //this.x = Math.sin(this.angle)*100;
+      this.position.y += 1.0;
+      this.position.x -= 1.0;
+
       //this.y = Math.cos(this.angle)*100;
   }
 }
