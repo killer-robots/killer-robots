@@ -1,12 +1,18 @@
 /* globals __DEV__ */
 import Phaser from 'phaser'
-import Mushroom from '../sprites/Mushroom'
+import Mushroom from '../sprites/Ship'
 
 export default class extends Phaser.State {
   init () {}
   preload () {}
 
   create () {
+    game.physics.startSystem(Phaser.Physics.ARCADE)
+
+    // Set up game input.
+    game.cursors = game.input.keyboard.createCursorKeys()
+    game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
+
     const bannerText = 'Phaser + ES6 + Webpack'
     let banner = this.add.text(this.world.centerX, this.game.height - 80, bannerText)
     banner.font = 'Bangers'
