@@ -26,7 +26,7 @@ export default class extends Phaser.State {
   }
   update() {
     var asteroidRandom = Math.random();
-    if (asteroidRandom > 0.99) {
+    if (asteroidRandom > 0.90) {
       var xRandom = Math.random();
       var yRandom = Math.random();
       var newAsteroid = new Asteroid({
