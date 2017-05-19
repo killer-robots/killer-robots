@@ -12,7 +12,8 @@ export default class extends Phaser.State {
     // Set up game input.
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
-
+    
+    this.background = new Phaser.TileSprite(game, 0, 0, 800, 600, 'background')
     this.player = new Ship({
       game: this,
       x: this.world.centerX,
@@ -20,6 +21,7 @@ export default class extends Phaser.State {
       asset: 'ship'
     })
 
+    this.game.add.existing(this.background)
     this.game.add.existing(this.player)
   }
 

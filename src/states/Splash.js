@@ -13,6 +13,7 @@ export default class extends Phaser.State {
     //
     // load your assets
     //
+    this.load.image('background', 'assets/background/deep-space.jpg')
     this.load.image('ship', 'assets/images/ship.png')
   }
 
