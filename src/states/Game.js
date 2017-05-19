@@ -26,8 +26,12 @@ export default class extends Phaser.State {
   }
 
   render () {
-    if (__DEV__) {
-      this.game.debug.spriteInfo(this.player, 32, 32)
-    }
+    var x = 32
+    var y = 32
+
+    // TODO: Use a proper font for this, not 'game.debug'.
+    this.game.debug.start(x, y);
+    this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
+    this.game.debug.stop();
   }
 }

@@ -11,10 +11,14 @@ export default class extends Phaser.Sprite {
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.body.drag.set(100)
     this.body.maxVelocity.set(movementSpeed)
+
+    this.fuel = this.fuelMax = 1000000
   }
 
   update () {
-    if (game.cursors.up.isDown) {
+    if (this.fuelTankIsEmpty()) {
+      this.body.acceleration.set(0)
+    } else if (game.cursors.up.isDown) {
       game.physics.arcade.accelerationFromRotation(this.rotation, movementSpeed, this.body.acceleration)
     } else if (game.cursors.down.isDown) {
       game.physics.arcade.accelerationFromRotation(this.rotation, -movementSpeed, this.body.acceleration)
@@ -33,5 +37,11 @@ export default class extends Phaser.Sprite {
     if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       // shoot
     }
+
+    this.fuel = Math.max(0, this.fuel - this.body.acceleration.getMagnitudeSq() / 1000)
+  }
+
+  fuelTankIsEmpty () {
+    return this.fuel == 0
   }
 }
