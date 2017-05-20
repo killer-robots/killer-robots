@@ -59,12 +59,14 @@ export default class extends Phaser.State {
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
-    this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+      this.weapon.bulletLifespan = 500;
+    this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
     this.weapon.bulletSpeed = 700;
     this.weapon.fireRate = 100;
     this.weapon.trackSprite(this.player, 0, 0, true);
 
     this.CoinGroup = this.game.add.physicsGroup();
+    this.FuelGroup = this.game.add.physicsGroup();
 
     this.barGraphics = game.add.graphics(0, 0)
     this.barGraphics.fixedToCamera = true
@@ -74,6 +76,7 @@ export default class extends Phaser.State {
     this.laser2 = game.add.audio('laser2');
     this.explosion1 = game.add.audio('explosion1');
     this.coin1 = game.add.audio('coin1');
+    this.fuel1 = game.add.audio('fuel1');
   }
 
 
@@ -90,6 +93,9 @@ export default class extends Phaser.State {
     }
     //Coin collection
     game.physics.arcade.overlap(this.player, this.CoinGroup, this.playerCollideCoin, null, this);
+
+    //Fuel collision
+      game.physics.arcade.overlap(this.player, this.FuelGroup, this.playerCollideFuel, null, this);
 
     //Player collisions
     game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
@@ -164,6 +170,12 @@ export default class extends Phaser.State {
     this.player.score += 1;
     coin.kill();
   }
+    playerCollideFuel (player, fuel) {
+        //  If the ship collides with a coin it gets eaten :)
+        this.fuel1.play();
+        this.player.fuel += 200000;
+        fuel.kill();
+    }
 
   addPlanets() {
     const planetDensity = 0.000004
@@ -229,6 +241,18 @@ export default class extends Phaser.State {
       }
     }
 
+    addFuel() {
+        if (this.FuelGroup.total < 25) {
+            var chanceOfFuel = 1;
+            var fuelRandom = Math.random();
+            if (fuelRandom < chanceOfFuel) {
+                var xPos = this.world.width * Math.random();
+                var yPos = this.world.width * Math.random();
+                var newFuel = this.FuelGroup.create(xPos, yPos, 'fuel');
+            }
+        }
+    }
+
     addAsteroid() {
       if (this.asteroids.total < 30) {
         var chanceOfAsteroid = 0.1;
@@ -245,7 +269,6 @@ export default class extends Phaser.State {
     addRobot() {
       if (this.robots.total < 5) {
         var chanceOfRobot = 0.1;
-
         var robotRandom = Math.random();
         if (robotRandom < chanceOfRobot) {
           var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
