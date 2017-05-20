@@ -40,7 +40,7 @@ export default class extends Phaser.State {
     this.game.add.existing(this.player);
 
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-    var fuelTextImage = game.add.image(5, 5, this.fuelText)
+    var fuelTextImage = game.add.image(362, 35, this.fuelText)
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
 
@@ -50,7 +50,7 @@ export default class extends Phaser.State {
     healthTextImage.fixedToCamera = true
 
       this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-      var scoreTextImage = game.add.image(300, 300, this.scoreText)
+      var scoreTextImage = game.add.image(5, 5, this.scoreText)
       scoreTextImage.tint = 0xFFD700
       scoreTextImage.fixedToCamera = true
 
@@ -208,13 +208,13 @@ export default class extends Phaser.State {
     this.barGraphics.clear();
     var y = 7
 
-    this.fuelText.text = 'fuel:'
-    this.drawBar(150, y, this.player.fuel / this.player.fuelMax)
-
-    this.healthText.text = 'shields:'
+    this.healthText.text = ' health'
     this.drawBar(600, y, this.player.health / this.player.maxHealth)
 
-    this.scoreText.text = 'score:' + this.player.score
+    this.fuelText.text = '   fuel'
+    this.drawBar(600, y + 30, this.player.fuel / this.player.fuelMax)
+
+    this.scoreText.text = 'score ' + this.player.score
   }
 
   addCoin() {
