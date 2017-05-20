@@ -5,6 +5,7 @@ import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
 import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
+import Sun from '../sprites/Sun'
 
 export default class extends Phaser.State {
   init () {}
@@ -18,11 +19,12 @@ export default class extends Phaser.State {
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
-    var worldWidth = 2000;
-    var worldHeight = 2000;
-
+    //Setup the world
+    var worldWidth = 4096;
+    var worldHeight = 4096;
     this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
 
+    //Setup the player
     this.world.setBounds(0,0,worldWidth,worldHeight);
     this.player = new Ship({
       game: this,
@@ -36,11 +38,17 @@ export default class extends Phaser.State {
     this.player.body.collideWorldBounds = true;
     this.camera.follow(this.player);
 
+    //Populate world with objects
     this.game.add.existing(this.background)
     this.addBlackHoles()
     this.addPlanets()
+    this.addSun()
     this.game.add.existing(this.player);
+    this.asteroids = game.add.physicsGroup();
+    this.robots = game.add.physicsGroup();
+    this.CoinGroup = this.game.add.physicsGroup();
 
+    //Add HUD info
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var fuelTextImage = game.add.image(362, 35, this.fuelText)
     fuelTextImage.tint = 0xFF7766
@@ -58,12 +66,6 @@ export default class extends Phaser.State {
 
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
-
-    this.sun = game.add.sprite(this.world.width*.8, this.world.height*.2, 'sun');
-    this.sun.anchor.x = 0.5;
-    this.sun.anchor.y = 0.5;
-    this.sun.animations.add('sun');
-    this.sun.play('sun', 7, true, false);
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
@@ -99,15 +101,15 @@ export default class extends Phaser.State {
 
 
   update() {
+    //Add objects
     this.addAsteroid();
     this.addRobot();
-
 	  this.addCoin();
 	  this.addFuel();
 	  this.addMedpack();
 
+	  //Check for firing input
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-      console.log('b');
       this.weapon.fire();
     }
     //Coin collection
@@ -137,6 +139,8 @@ export default class extends Phaser.State {
   }
 
   playerCollideRobot(player, robot) {
+    this.checkIfPlayerStillAlive();
+
     this.makeExplosion(
       (player.body.x + robot.body.x) / 2,
       (player.body.y + robot.body.y) / 2
@@ -179,9 +183,8 @@ export default class extends Phaser.State {
 
   playerCollideAsteroid (player, asteroid) {
     this.player.health -= player.maxHealth / 10;
-    if (this.player.health <= 0) {
-      //TODO:  Kill player and explode ship
-    }
+    this.checkIfPlayerStillAlive();
+
     this.makeExplosion(asteroid.body.x, asteroid.body.y);
     this.asteroids.remove(asteroid);
   }
@@ -205,6 +208,12 @@ export default class extends Phaser.State {
         medpack.kill();
     }
 
+  checkIfPlayerStillAlive() {
+    if (this.player.health <= 0) {
+      //TODO:  End game
+    }
+  }
+
   addPlanets() {
     const planetDensity = 0.000004
     const planetCount = this.world.width * this.world.height * planetDensity
@@ -226,16 +235,40 @@ export default class extends Phaser.State {
     const blackHoleCount = 1
     this.game.blackHoles = []
 
+    var onTop = Math.random() > 0.5;
+    var onLeft = Math.random() > 0.5;
+
     for (var i = 0; i < blackHoleCount; i++) {
       var blackHole = new BlackHole({
         game: this,
-        x: this.world.width*.2,
-        y: this.world.height*.8,
+        x: this.world.width*(onLeft ? 0.2 : 0.8),
+        y: this.world.height*(onTop ? 0.2 : 0.8),
         asset: 'blackhole'
       })
       this.game.blackHoles.push(blackHole)
       this.game.add.existing(blackHole)
     }
+  }
+
+  addSun() {
+    this.game.suns = []
+
+    //Check where black hole was placed
+    var blackHole = this.game.blackHoles[0];
+    var onLeft = blackHole.x > this.world.width * 0.5;
+    var onTop = blackHole.y > this.world.height * 0.5;
+
+    //Place sun in opposite corner
+    var sun = new Sun({
+      game: this.game,
+      x: this.world.width*(onLeft ? 0.2 : 0.8),
+      y: this.world.height*(onTop ? 0.2 : 0.8),
+      asset: 'sun'
+    })
+    this.game.suns.push(sun);
+    this.game.add.existing(sun);
+    sun.animations.add('sun');
+    sun.play('sun', 7, true, false);
   }
 
   drawBar(x, y, percentage) {
@@ -269,100 +302,102 @@ export default class extends Phaser.State {
 
   addCoin() {
     if (this.CoinGroup.total < 25) {
-        var chanceOfCoin = 0.05;
+      var chanceOfCoin = 0.05;
 
-        var coinRandom = Math.random();
-        if (coinRandom < chanceOfCoin) {
-          var xPos = this.world.width * Math.random();
-          var yPos = this.world.width * Math.random();
-          var newCoin = this.CoinGroup.create(xPos, yPos, 'coin');
-          newCoin.width = 32;
-          newCoin.height = 32;
-          newCoin.animations.add('coin');
-          newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
-          newCoin.play('coin', 10, true, false);
-        }
+      var coinRandom = Math.random();
+      if (coinRandom < chanceOfCoin) {
+        var xPos = this.world.width * Math.random();
+        var yPos = this.world.width * Math.random();
+        var newCoin = this.CoinGroup.create(xPos, yPos, 'coin');
+        newCoin.width = 32;
+        newCoin.height = 32;
+        newCoin.animations.add('coin');
+        newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
+        newCoin.play('coin', 10, true, false);
       }
     }
+  }
+  
+  addFuel() {
+      if (this.FuelGroup.total < 5) {
+          var chanceOfFuel = .1;
+          var fuelRandom = Math.random();
+          if (fuelRandom < chanceOfFuel) {
+              var xPos = this.world.width * Math.random();
+              var yPos = this.world.width * Math.random();
+              var newFuel = this.FuelGroup.create(xPos, yPos, 'fuel');
+          }
+      }
+  }
 
-    addFuel() {
-        if (this.FuelGroup.total < 5) {
-            var chanceOfFuel = .1;
-            var fuelRandom = Math.random();
-            if (fuelRandom < chanceOfFuel) {
-                var xPos = this.world.width * Math.random();
-                var yPos = this.world.width * Math.random();
-                var newFuel = this.FuelGroup.create(xPos, yPos, 'fuel');
-            }
-        }
-    }
+  addMedpack() {
+      if (this.MedpackGroup.total < 5) {
+          var chanceOfMedpack = .1;
+          var medpackRandom = Math.random();
+          if (medpackRandom < chanceOfMedpack) {
+              var xPos = this.world.width * Math.random();
+              var yPos = this.world.width * Math.random();
+              var newMedpack = this.MedpackGroup.create(xPos, yPos, 'medpack');
+          }
+      }
+  }
 
-    addMedpack() {
-        if (this.MedpackGroup.total < 5) {
-            var chanceOfMedpack = .1;
-            var medpackRandom = Math.random();
-            if (medpackRandom < chanceOfMedpack) {
-                var xPos = this.world.width * Math.random();
-                var yPos = this.world.width * Math.random();
-                var newMedpack = this.MedpackGroup.create(xPos, yPos, 'medpack');
-            }
-        }
-    }
+  addAsteroid() {
+    if (this.asteroids.total < 30) {
+      var chanceOfAsteroid = 0.1;
 
-    addAsteroid() {
-      if (this.asteroids.total < 30) {
-        var chanceOfAsteroid = 0.1;
-
-        var asteroidRandom = Math.random();
-        if (asteroidRandom < chanceOfAsteroid) {
-          var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
-          var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
-          this.asteroids.add(newAsteroid);
-        }
+      var asteroidRandom = Math.random();
+      if (asteroidRandom < chanceOfAsteroid) {
+        var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
+        var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
+        this.asteroids.add(newAsteroid);
       }
     }
+  }
 
-    addRobot() {
-      if (this.robots.total < 5) {
-        var chanceOfRobot = 0.1;
-        var robotRandom = Math.random();
-        if (robotRandom < chanceOfRobot) {
-          var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
-          var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
-          this.robots.add(newRobot);
-        }
+
+  addRobot() {
+    if (this.robots.total < 5) {
+      var chanceOfRobot = 0.1;
+
+      var robotRandom = Math.random();
+      if (robotRandom < chanceOfRobot) {
+        var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
+        var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
+        this.robots.add(newRobot);
       }
     }
+  }
 
-    getPositionAlongEdge(randomSeed, seedRange) {
-      var xPos, yPos;
-      if (randomSeed <= seedRange / 4)
-      {
-        xPos = this.world.width * Math.random();
-        yPos = 0;
-      }
-      else if (randomSeed <= seedRange / 2) {
-        xPos = this.world.width * Math.random();
-        yPos = this.world.height-1;
-      }
-      else if (randomSeed <= (seedRange*3) /4 ) {
-        xPos = 0;
-        yPos = this.world.height * Math.random();
-      }
-      else {
-        xPos = this.world.width-1;
-        yPos = this.world.height * Math.random();
-      }
-      return {x:xPos, y:yPos};
+  getPositionAlongEdge(randomSeed, seedRange) {
+    var xPos, yPos;
+    if (randomSeed <= seedRange / 4)
+    {
+      xPos = this.world.width * Math.random();
+      yPos = 0;
     }
-
-    makeExplosion(x, y) {
-      var explosion = game.add.sprite(x, y, 'kaboom');
-      explosion.anchor.x = 0.5;
-      explosion.anchor.y = 0.5;
-      explosion.animations.add('kaboom');
-      explosion.play('kaboom', 30, false, true);
-
-      this.explosion1.play();
+    else if (randomSeed <= seedRange / 2) {
+      xPos = this.world.width * Math.random();
+      yPos = this.world.height-1;
     }
+    else if (randomSeed <= (seedRange*3) /4 ) {
+      xPos = 0;
+      yPos = this.world.height * Math.random();
+    }
+    else {
+      xPos = this.world.width-1;
+      yPos = this.world.height * Math.random();
+    }
+    return {x:xPos, y:yPos};
+  }
+
+  makeExplosion(x, y) {
+    var explosion = game.add.sprite(x, y, 'kaboom');
+    explosion.anchor.x = 0.5;
+    explosion.anchor.y = 0.5;
+    explosion.animations.add('kaboom');
+    explosion.play('kaboom', 30, false, true);
+
+    this.explosion1.play();
+  }
 }
