@@ -31,7 +31,6 @@ export default class extends Phaser.State {
     this.game.add.existing(this.player);
 
     this.asteroids = game.add.physicsGroup();
-      this.asteroids.create(game.rnd.between(100, 770), game.rnd.between(0, 570), 'asteroid', 0);
   }
 
   update() {
@@ -94,14 +93,37 @@ export default class extends Phaser.State {
         yPos = this.world.height * Math.random();
       }
 
-      var newAsteroid = new Asteroid({
-        game: this,
-        x: xPos,
-        y: yPos,
-        asset: 'asteroid'
-      })
+      var newAsteroid =  this.asteroids.create(xPos, yPos, 'asteroid', 0);
 
-      this.game.add.existing(newAsteroid);
+      var baseSpeed = 100
+      var speedX = 0
+      var speedY = 0
+      if (xPos== 0) {
+        speedX = baseSpeed * Math.random()
+      } else {
+        speedX = -baseSpeed * Math.random()
+      }
+      if (yPos == 0) {
+        speedY = baseSpeed * Math.random()
+      } else {
+        speedY = -baseSpeed * Math.random()
+      }
+
+      var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
+
+      var direction = new Phaser.Point(speedX, speedY)
+      newAsteroid.body.velocity = direction
+
+      var randomAngle = 45 + Phaser.Math.radToDeg(
+          Phaser.Point.angle(
+            newAsteroid.position,
+            new Phaser.Point(
+              newAsteroid.x + newAsteroid.body.velocity.x,
+              newAsteroid.y + newAsteroid.body.velocity.y)
+          )
+        )
+      newAsteroid.angle = randomAngle;
+      newAsteroid.outOfBoundsKill = true;
     }
   }
 
