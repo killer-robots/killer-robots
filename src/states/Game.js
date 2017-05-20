@@ -19,9 +19,7 @@ export default class extends Phaser.State {
     var worldWidth = 2000;
     var worldHeight = 2000;
 
-
     this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
-
 
     this.world.setBounds(0,0,worldWidth,worldHeight);
     this.player = new Ship({
@@ -39,7 +37,17 @@ export default class extends Phaser.State {
     this.game.add.existing(this.player);
 
     this.asteroids = game.add.physicsGroup();
+    this.explosions = game.add.group();
+    this.explosions.createMultiple(10, 'kaboom');
+    this.explosions.forEach(this.setupExplosion, this);
   }
+
+  setupExplosion(explosion) {
+    explosion.anchor.x = 0.5;
+    explosion.anchor.y = 0.5;
+    explosion.animations.add('kaboom');
+  }
+
 
   update() {
     this.addAsteroid();
@@ -49,16 +57,18 @@ export default class extends Phaser.State {
       }
   }
 
-
-  render () {
-    var x = 32
-    var y = 32
-
-    // TODO: Use a proper font for this, not 'game.debug'.
-    this.game.debug.start(x, y);
-    this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
-    this.game.debug.stop();
+  processHandler (player, asteroids) {
+    return true;
   }
+
+  collisionHandler (player, asteroid) {
+    this.player.health -= player.maxHealth/10;
+    var explosion = this.explosions.getFirstExists(false);
+    explosion.reset(asteroid.body.x, asteroid.body.y);
+    asteroid.destroy();
+    explosion.play('kaboom', 30, false, true);
+  }
+
 
   addPlanets() {
     const asteroidCount = 2
@@ -77,7 +87,7 @@ export default class extends Phaser.State {
   }
 
   addAsteroid() {
-    var chanceOfAsteroid = 0.01;
+    var chanceOfAsteroid = 0.1;
 
     var asteroidRandom = Math.random();
     if (asteroidRandom < chanceOfAsteroid) {
@@ -135,14 +145,15 @@ export default class extends Phaser.State {
     }
   }
 
-    processHandler (player, asteroids) {
 
-        return true;
+  render () {
+    var x = 32
+    var y = 32
 
-    }
+    // TODO: Use a proper font for this, not 'game.debug'.
+    this.game.debug.start(x, y);
+    this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
+    this.game.debug.stop();
+  }
 
-    collisionHandler (player, asteroids) {
-
-        this.player.fuel = 0;
-    }
 }

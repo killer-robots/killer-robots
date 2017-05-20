@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import Bullet from '../sprites/Bullet'
 
 const movementSpeed = 500
+const maxHealth = 100
 
 export default class extends Phaser.Sprite {
   constructor ({ game, x, y, asset }) {
@@ -14,6 +15,7 @@ export default class extends Phaser.Sprite {
     this.body.maxVelocity.set(movementSpeed)
     this.fuel = this.fuelMax = 1000000
     this.firerate = 10
+    this.health = maxHealth
   }
 
   update () {
