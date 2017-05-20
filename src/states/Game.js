@@ -48,6 +48,11 @@ export default class extends Phaser.State {
     healthTextImage.tint = 0x28bb35
     healthTextImage.fixedToCamera = true
 
+      this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+      var scoreTextImage = game.add.image(300, 300, this.scoreText)
+      scoreTextImage.tint = 0xFFD700
+      scoreTextImage.fixedToCamera = true
+
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
     this.explosions = game.add.group();
@@ -158,6 +163,7 @@ export default class extends Phaser.State {
   playerCollideCoin (player, coin) {
     //  If the ship collides with a coin it gets eaten :)
     this.coin1.play();
+    this.player.score += 1;
     coin.kill();
   }
 
@@ -184,6 +190,7 @@ export default class extends Phaser.State {
 
     this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
     this.healthText.text = 'shields:' + Math.round(this.player.health / this.player.maxHealth * 100) + '%'
+    this.scoreText.text = 'score:' + score
   }
 
   addCoin() {
