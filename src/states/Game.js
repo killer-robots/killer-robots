@@ -56,9 +56,6 @@ export default class extends Phaser.State {
 
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
-    this.explosions = game.add.group();
-    this.explosions.createMultiple(30, 'kaboom');
-    this.explosions.forEach(this.setupExplosion, this);
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
@@ -79,11 +76,6 @@ export default class extends Phaser.State {
     this.coin1 = game.add.audio('coin1');
   }
 
-  setupExplosion(explosion) {
-    explosion.anchor.x = 0.5;
-    explosion.anchor.y = 0.5;
-    explosion.animations.add('kaboom');
-  }
 
   update() {
     this.addAsteroid();
@@ -104,64 +96,66 @@ export default class extends Phaser.State {
     game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
 
     //Bullets
-    game.physics.arcade.collide(this.player.bullet, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
-    game.physics.arcade.collide(this.player.bullet, this.robots, this.playerBulletCollideRobot, null, this);
+    console.log("Bullets:" + this.weapon.bullets.total);
+    game.physics.arcade.collide(this.weapon.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
+    game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
 
     //Self-collisions
     game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  null, this);
     game.physics.arcade.collideGroupVsSelf(this.robots, this.robotCollideRobot,  null, this);
 
     //Robot/asteroid collisions
-    //game.physics.arcade.collide(this.asteroids, this.robots, this.asteroidCollideOther, null, this);
+    game.physics.arcade.collide(this.asteroids, this.robots, this.asteroidCollideRobot, null, this);
   }
 
   playerCollideRobot(player, robot) {
+    this.makeExplosion(
+      (player.body.x + robot.body.x) / 2,
+      (player.body.y + robot.body.y) / 2
+    );
 
+    this.player.health -= player.maxHealth/4;
+    this.robots.remove(robot);
   }
   robotCollideRobot(robot1, robot2) {
-
+    this.makeExplosion(
+      (robot1.body.x + robot2.body.x) / 2,
+      (robot1.body.y + robot2.body.y) / 2
+    );
+    this.robots.remove(robot1);
+    this.robots.remove(robot2);
   }
   playerBulletCollideRobot(bullet, robot) {
-
+    this.makeExplosion(robot.body.x, robot.body.y);
+    this.robots.remove(robot);
+  }
+  asteroidCollideRobot(asteroid, robot) {
+    this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
+      (asteroid.body.y + robot.body.y) / 2);
+    this.asteroids.remove(asteroid);
+    this.robots.remove(robot);
   }
 
-  asteroidCollideOther (asteroid, other) {
-    if (typeof asteroid !== 'undefined' && asteroid &&
-        typeof other !== 'undefined' && other) {
-      var explosion = this.explosions.getFirstExists(false);
-      explosion.reset((asteroid.body.x + other.body.x) / 2,
-                      (asteroid.body.y + other.body.y) / 2);
-      asteroid.destroy();
-      other.destroy();
-      explosion.play('kaboom', 30, false, true);
-    }
+  asteroidCollideOther (asteroid, asteroid2) {
+    this.makeExplosion(((asteroid.body.x + asteroid2.body.x) / 2),
+                      (asteroid.body.y + asteroid2.body.y) / 2);
+    this.asteroids.remove(asteroid);
+    this.asteroids.remove(asteroid2);
   }
 
   bulletCollideAsteroidHandler (bullet, asteroid) {
-    if (typeof bullet !== 'undefined' && bullet &&
-        typeof asteroid !== 'undefined' && asteroid) {
-      var explosion = this.explosions.getFirstExists(false);
-      if (!explosion) return;
-      explosion.reset(object.body.x, object.body.y);
-      object.destroy();
-      explosion.play('kaboom', 30, false, true);
-    }
+    this.makeExplosion(asteroid.body.x, asteroid.body.y);
+    this.asteroids.remove(asteroid);
+    this.weapon.bullets.remove(bullet);
   }
 
   playerCollideAsteroid (player, asteroid) {
-    if (typeof player !== 'undefined' && player &&
-        typeof asteroid !== 'undefined' && asteroid) {
-      this.explosion1.play();
-      this.player.health -= player.maxHealth / 10;
-      if (this.player.health <= 0) {
-        //TODO:  Kill player and explode ship
-      }
-
-      var explosion = this.explosions.getFirstExists(false);
-      explosion.reset(asteroid.body.x, asteroid.body.y);
-      asteroid.destroy();
-      explosion.play('kaboom', 30, false, true);
+    this.player.health -= player.maxHealth / 10;
+    if (this.player.health <= 0) {
+      //TODO:  Kill player and explode ship
     }
+    this.makeExplosion(asteroid.body.x, asteroid.body.y);
+    this.asteroids.remove(asteroid);
   }
 
   playerCollideCoin (player, coin) {
@@ -218,40 +212,46 @@ export default class extends Phaser.State {
   }
 
   addCoin() {
-    var chanceOfCoin = 0.05;
+    if (this.CoinGroup.total < 25) {
+        var chanceOfCoin = 0.05;
 
-    var coinRandom = Math.random();
-    if (coinRandom < chanceOfCoin) {
-        var xPos = this.world.width * Math.random();
-        var yPos = this.world.width * Math.random();
-        var newCoin = this.CoinGroup.create(xPos, yPos, 'coin');
-        newCoin.width = 32;
-        newCoin.height = 32;
-        newCoin.animations.add('coin');
-        newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
-        newCoin.play('coin', 10, true, false);
+        var coinRandom = Math.random();
+        if (coinRandom < chanceOfCoin) {
+          var xPos = this.world.width * Math.random();
+          var yPos = this.world.width * Math.random();
+          var newCoin = this.CoinGroup.create(xPos, yPos, 'coin');
+          newCoin.width = 32;
+          newCoin.height = 32;
+          newCoin.animations.add('coin');
+          newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
+          newCoin.play('coin', 10, true, false);
+        }
       }
     }
 
     addAsteroid() {
-      var chanceOfAsteroid = 0.1;
+      if (this.asteroids.total < 30) {
+        var chanceOfAsteroid = 0.1;
 
-      var asteroidRandom = Math.random();
-      if (asteroidRandom < chanceOfAsteroid) {
-        var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
-        var newAsteroid = new Asteroid({ game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid' });
-        this.asteroids.add(newAsteroid);
+        var asteroidRandom = Math.random();
+        if (asteroidRandom < chanceOfAsteroid) {
+          var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
+          var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
+          this.asteroids.add(newAsteroid);
+        }
       }
     }
 
     addRobot() {
-      var chanceOfRobot = 0.1;
+      if (this.robots.total < 5) {
+        var chanceOfRobot = 0.1;
 
-      var robotRandom = Math.random();
-      if (robotRandom < chanceOfRobot) {
-        var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
-        var newRobot = new Robot({ game: this, x: newPosition.x, y: newPosition.y, asset: 'robot' });
-        this.robots.add(newRobot);
+        var robotRandom = Math.random();
+        if (robotRandom < chanceOfRobot) {
+          var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
+          var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
+          this.robots.add(newRobot);
+        }
       }
     }
 
@@ -277,4 +277,13 @@ export default class extends Phaser.State {
       return {x:xPos, y:yPos};
     }
 
+    makeExplosion(x, y) {
+      var explosion = game.add.sprite(x, y, 'kaboom');
+      explosion.anchor.x = 0.5;
+      explosion.anchor.y = 0.5;
+      explosion.animations.add('kaboom');
+      explosion.play('kaboom', 30, false, true);
+
+      this.explosion1.play();
+    }
 }
