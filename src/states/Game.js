@@ -5,6 +5,7 @@ import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
 import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
+import Sun from '../sprites/Sun'
 
 export default class extends Phaser.State {
   init () {}
@@ -18,8 +19,8 @@ export default class extends Phaser.State {
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
-    var worldWidth = 2000;
-    var worldHeight = 2000;
+    var worldWidth = 4096;
+    var worldHeight = 4096;
 
     this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
 
@@ -39,6 +40,7 @@ export default class extends Phaser.State {
     this.game.add.existing(this.background)
     this.addBlackHoles()
     this.addPlanets()
+    this.addSun()
     this.game.add.existing(this.player);
 
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
@@ -58,12 +60,6 @@ export default class extends Phaser.State {
 
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
-
-    this.sun = game.add.sprite(this.world.width*.8, this.world.height*.2, 'sun');
-    this.sun.anchor.x = 0.5;
-    this.sun.anchor.y = 0.5;
-    this.sun.animations.add('sun');
-    this.sun.play('sun', 7, true, false);
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
@@ -198,16 +194,36 @@ export default class extends Phaser.State {
     const blackHoleCount = 1
     this.game.blackHoles = []
 
+    var onTop = Math.random() > 0.5;
+    var onLeft = Math.random() > 0.5;
+
     for (var i = 0; i < blackHoleCount; i++) {
       var blackHole = new BlackHole({
         game: this,
-        x: this.world.width*.2,
-        y: this.world.height*.8,
+        x: this.world.width*(onLeft ? 0.2 : 0.8),
+        y: this.world.height*(onTop ? 0.2 : 0.8),
         asset: 'blackhole'
       })
       this.game.blackHoles.push(blackHole)
       this.game.add.existing(blackHole)
     }
+  }
+
+  addSun() {
+    this.game.suns = []
+    var blackHole = this.game.blackHoles[0];
+    var onLeft = blackHole.x > this.world.width * 0.5;
+    var onTop = blackHole.y > this.world.height * 0.5;
+    var sun = new Sun({
+      game: this.game,
+      x: this.world.width*(onLeft ? 0.2 : 0.8),
+      y: this.world.height*(onTop ? 0.2 : 0.8),
+      asset: 'sun'
+    })
+    this.game.suns.push(sun);
+    this.game.add.existing(sun);
+    sun.animations.add('sun');
+    sun.play('sun', 7, true, false);
   }
 
   drawBar(x, y, percentage) {
