@@ -115,7 +115,6 @@ export default class extends Phaser.State {
     explosion.play('kaboom', 30, false, true);
   }
 
-
   bulletCollideAsteroidHandler (bullet, asteroid) {
     var explosion = this.explosions.getFirstExists(false);
     if (!explosion) return;
@@ -212,6 +211,9 @@ export default class extends Phaser.State {
               newAsteroid.y + newAsteroid.body.velocity.y)
           )
         )
+      newAsteroid.body.setCircle(10, 5, 5);
+      newAsteroid.anchor.x = 0.5;
+      newAsteroid.anchor.y = 0.5;
       newAsteroid.angle = randomAngle;
       newAsteroid.outOfBoundsKill = true;
     }
