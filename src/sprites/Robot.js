@@ -47,7 +47,7 @@ export default class extends Phaser.Sprite {
           game: this.game,
           x: this.body.center.x,
           y: this.body.center.y,
-          asset: 'bullet',
+          asset: 'green-bullet',
           rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
         })
         this.game.add.existing(newBullet)
