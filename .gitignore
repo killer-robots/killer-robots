@@ -1,7 +1,9 @@
 node_modules/
 dist/
 .vscode/
-npm-debug.log
+nbproject/
+.DS_Store
+npm-debug.log*
 .idea/codeStyleSettings.xml
 .idea/killer-robots.iml
 .idea/misc.xml
