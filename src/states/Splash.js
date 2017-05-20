@@ -27,6 +27,7 @@ export default class extends Phaser.State {
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
     }
+    this.load.image('blackhole', 'assets/images/blackhole.png')
 
     game.load.spritesheet('coin', 'assets/images/spinningcoin.png',300,259)
 

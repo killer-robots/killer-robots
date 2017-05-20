@@ -59,6 +59,9 @@ export default class extends Phaser.Sprite {
     for (let planet of game.planets) {
       planet.applyGravityTo(this)
     }
+    for (let blackHole of game.blackHoles) {
+      blackHole.applyGravityTo(this)
+    }
   }
 
   playerIsNearby() {

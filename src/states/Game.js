@@ -3,6 +3,7 @@ import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
 import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
+import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
 
 export default class extends Phaser.State {
@@ -36,6 +37,7 @@ export default class extends Phaser.State {
     this.camera.follow(this.player);
 
     this.game.add.existing(this.background)
+    this.addBlackHoles()
     this.addPlanets()
     this.game.add.existing(this.player);
 
@@ -179,6 +181,22 @@ export default class extends Phaser.State {
       })
       this.game.planets.push(planet)
       this.game.add.existing(planet)
+    }
+  }
+
+  addBlackHoles() {
+    const blackHoleCount = 1
+    this.game.blackHoles = []
+
+    for (var i = 0; i < blackHoleCount; i++) {
+      var blackHole = new BlackHole({
+        game: this,
+        x: this.world.randomX,
+        y: this.world.randomY,
+        asset: 'blackhole'
+      })
+      this.game.blackHoles.push(blackHole)
+      this.game.add.existing(blackHole)
     }
   }
 
