@@ -8,29 +8,52 @@ export default class extends Phaser.State {
   preload () {}
 
   create () {
-    //Setup physics
+    //Initialize physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
+    this.asteroidGroup = game.add.physicsGroup();
+    //this.asteroidGroup.classType = Asteroid;
 
     // Set up game input.
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
+    //Background image logic
     this.background = new Phaser.TileSprite(game, 0, 0, 800, 600, 'background')
+    this.game.add.existing(this.background);
 
-
+    //Player ship logic
     this.player = new Ship({
       game: this,
       x: this.world.centerX,
       y: this.world.centerY,
       asset: 'ship'
     })
-
-    this.game.add.existing(this.background)
     this.game.add.existing(this.player);
+
+    //Setup player/asteroid physics
+    this.player.body.collideWorldBounds = true;
+    game.physics.arcade.enable(this.player);
+
   }
 
   update() {
     this.addAsteroid();
+
+    console.log("Asteroids in physics group: " + this.asteroidGroup.total);
+
+    if (game.physics.arcade.collide(this.player, this.asteroidGroup))
+    {
+      console.log("Asteroid collision!");
+    }
+
+  }
+
+  processHandler(player, asteroid) {
+    return true;
+  }
+
+  collisionHandler(player, asteroid) {
+
   }
 
 
@@ -45,10 +68,11 @@ export default class extends Phaser.State {
   }
 
   addAsteroid() {
-    var chanceOfAsteroid = 0.01;
+    var chanceOfAsteroid = 0.1;
 
     var asteroidRandom = Math.random();
     if (asteroidRandom < chanceOfAsteroid) {
+
       var xPos = 0;
       var yPos = 0;
       if (asteroidRandom <= chanceOfAsteroid / 4)
@@ -69,14 +93,13 @@ export default class extends Phaser.State {
         yPos = this.world.height * Math.random();
       }
 
-      var newAsteroid = new Asteroid({
-        game: this,
-        x: xPos,
-        y: yPos,
-        asset: 'asteroid'
-      })
+      console.log("X:" + xPos, "Y: " + yPos);
+      var newAsteroid = new Asteroid(game, xPos, yPos, "asteroid");
+      this.asteroidGroup.add.existing(newAsteroid);
+      //this.asteroidGroup.create( xPos,  yPos, 'asteroid');
 
-      this.game.add.existing(newAsteroid);
+
+      console.log("After: " + this.asteroidGroup.total);
     }
   }
 }
