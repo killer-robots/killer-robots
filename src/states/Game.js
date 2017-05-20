@@ -127,15 +127,14 @@ export default class extends Phaser.State {
         yPos = this.world.height * Math.random()+100;
       }
 	  var newCoin = this.CoinGroup.create(xPos, yPos,'coin');
-	  /*var newCoin = new Coin({
-		  game: this,
-		  x: xPos,
-		  y: yPos,
-		  asset: 'coin'
-	  })*/
 	  newCoin.width =16;
 	  newCoin.height =16;
-      //this.game.add.existing(newCoin);
+      newCoin.animations.add('run');
+
+    //  And this starts the animation playing by using its key ("run")
+    //  15 is the frame rate (15fps)
+    //  true means it will loop when it finishes
+      newCoin.animations.play('run', 15, true);
     }
   }
   collisionHandler (player, coin) {

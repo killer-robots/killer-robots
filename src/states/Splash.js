@@ -18,12 +18,12 @@ export default class extends Phaser.State {
     this.load.image('ship', 'assets/images/ship.png')
     this.load.image('asteroid', 'assets/images/asteroid.png')
     this.load.image('bullet', 'assets/images/bullet.png')
-	this.load.image('coin', 'assets/images/coin.png');
+	//this.load.image('coin', 'assets/images/coin.png');
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
     }
     
-    //game.load.spritesheet('coin', 'assets/images/spinningcoin.png')
+    game.load.spritesheet('coin', 'assets/images/spinningcoin.png')
   }
 
   create () {
