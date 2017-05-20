@@ -16,9 +16,14 @@ export default class extends Phaser.State {
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
-    this.background = new Phaser.TileSprite(game, 0, 0, 800, 600, 'background')
+    var worldWidth = 2000;
+    var worldHeight = 2000;
 
 
+    this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
+
+
+    this.world.setBounds(0,0,worldWidth,worldHeight);
     this.player = new Ship({
       game: this,
       x: this.world.centerX,
@@ -26,9 +31,13 @@ export default class extends Phaser.State {
       asset: 'ship'
     })
 
+    this.player.body.collideWorldBounds = true;
+    this.camera.follow(this.player);
+
     this.game.add.existing(this.background)
     this.addPlanets()
     this.game.add.existing(this.player);
+
   }
 
   update() {
