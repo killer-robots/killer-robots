@@ -103,38 +103,24 @@ export default class extends Phaser.State {
     }
   }
   addCoin() {
-    var chanceOfCoin = 0.01;
+    var chanceOfCoin = 0.05;
 
     var coinRandom = Math.random();
     if (coinRandom < chanceOfCoin) {
       var xPos = Math.random();
       var yPos = Math.random();
-      if (coinRandom <= chanceOfCoin / 4)
-      {
-        xPos = this.world.width * Math.random();
-        yPos = Math.random();
-      }
-      else if (coinRandom <= chanceOfCoin / 2) {
-        xPos = this.world.width * Math.random()+100;
-        yPos = this.world.height* Math.random()+100;
-      }
-      else if (coinRandom <= (chanceOfCoin*3) /4 ) {
-        xPos = this.world.width * Math.random()+100;
-        yPos = this.world.height * Math.random()+100;
-      }
-      else {
-        xPos = this.world.width* Math.random()+100;
-        yPos = this.world.height * Math.random()+100;
-      }
+      xPos = this.world.width * Math.random();
+      yPos = this.world.width * Math.random();
 	  var newCoin = this.CoinGroup.create(xPos, yPos,'coin');
-	  newCoin.width =16;
-	  newCoin.height =16;
-      newCoin.animations.add('run');
+	  newCoin.width =32;
+	  newCoin.height =32;
+      newCoin.animations.add('coin');
 
     //  And this starts the animation playing by using its key ("run")
     //  15 is the frame rate (15fps)
     //  true means it will loop when it finishes
-      newCoin.animations.play('run', 15, true);
+	  newCoin.body.setCircle(10,5,5);//(radius,xoffset,yoffset);
+      newCoin.play('coin', 10, true, false);
     }
   }
   collisionHandler (player, coin) {
