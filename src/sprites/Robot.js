@@ -42,6 +42,7 @@ export default class extends Phaser.Sprite {
 
       // Try to shoot the player.
       if (this.firerate < 0) {
+        this.game.laser2.play();
         var newBullet = new Bullet({
           game: this.game,
           x: this.body.center.x,

@@ -26,8 +26,13 @@ export default class extends Phaser.State {
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
     }
-    
+
     game.load.spritesheet('coin', 'assets/images/spinningcoin.png',300,259)
+
+    game.load.audio('laser1', 'assets/audio/laser1.wav')
+    game.load.audio('laser2', 'assets/audio/laser2.wav')
+    game.load.audio('explosion1', 'assets/audio/explosion1.wav')
+    game.load.audio('coin1', 'assets/audio/coin1.wav')
   }
 
   create () {

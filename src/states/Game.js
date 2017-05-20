@@ -62,6 +62,12 @@ export default class extends Phaser.State {
     this.weapon.trackSprite(this.player, 0, 0, true);
 
     this.CoinGroup = this.game.add.physicsGroup();
+
+    // Audio
+    this.laser1 = game.add.audio('laser1');
+    this.laser2 = game.add.audio('laser2');
+    this.explosion1 = game.add.audio('explosion1');
+    this.coin1 = game.add.audio('coin1');
   }
 
   setupExplosion(explosion) {
@@ -83,6 +89,7 @@ export default class extends Phaser.State {
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       console.log('b');
       this.weapon.fire();
+      this.laser1.play();
     }
 
     if (game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this)) {
@@ -117,6 +124,7 @@ export default class extends Phaser.State {
   }
 
   asteroidCollideAsteroidHandler (asteroid1, asteroid2) {
+    this.explosion1.play();
     var explosion = this.explosions.getFirstExists(false);
     explosion.reset((asteroid1.body.x + asteroid2.body.x) / 2,
       (asteroid1.body.y + asteroid2.body.y) / 2);
@@ -126,6 +134,7 @@ export default class extends Phaser.State {
   }
 
   bulletCollideAsteroidHandler (bullet, asteroid) {
+    this.explosion1.play();
     var explosion = this.explosions.getFirstExists(false);
     if (!explosion) return;
     explosion.reset(object.body.x, object.body.y);
@@ -134,6 +143,7 @@ export default class extends Phaser.State {
   }
 
   playerCollideAsteroid (player, asteroid) {
+    this.explosion1.play();
     this.player.health -= player.maxHealth/10;
     if (this.player.health <= 0) {
       //TODO:  Kill player and explode ship
@@ -147,6 +157,7 @@ export default class extends Phaser.State {
 
   playerCollideCoin (player, coin) {
     //  If the ship collides with a coin it gets eaten :)
+    this.coin1.play();
     coin.kill();
   }
 
