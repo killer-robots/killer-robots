@@ -49,7 +49,7 @@ export default class extends Phaser.State {
     healthTextImage.fixedToCamera = true
 
     this.asteroids = game.add.physicsGroup();
-    this.robots = [];
+    this.robots = game.add.physicsGroup();
     this.explosions = game.add.group();
     this.explosions.createMultiple(30, 'kaboom');
     this.explosions.forEach(this.setupExplosion, this);
@@ -102,9 +102,22 @@ export default class extends Phaser.State {
     {
       console.log('asteroid hit asteroid!');
     }
-    game.physics.arcade.collide(this.player, this.robots, this.collisionHandler, this.processHandler, this)
-    game.physics.arcade.collide(this.robots, this.robots, this.collisionHandler, this.processHandler, this)
-    game.physics.arcade.collide(this.player.bullet, this.robots, this.collisionHandler, this.processHandler, this)
+    if (game.physics.arcade.collideGroupVsSelf(this.robots, this.robotCollideRobot,  this.processHandler, this))
+    {
+      console.log('robot hit robot!');
+    }
+    game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, this.processHandler, this)
+    game.physics.arcade.collide(this.player.bullet, this.robots, this.playerBulletCollideRobot, this.processHandler, this)
+  }
+
+  playerCollideRobot(player, robot) {
+
+  }
+  robotCollideRobot(robot1, robot2) {
+
+  }
+  playerBulletCollideRobot(bullet, robot) {
+
   }
 
   asteroidCollideAsteroidHandler (asteroid1, asteroid2) {
@@ -246,8 +259,9 @@ export default class extends Phaser.State {
       }
 
       var newRobot = new Robot({ game: this, x: xPos, y: yPos, asset: 'robot' });
-      this.robots.push(newRobot);
-      game.add.existing(newRobot);
+      //this.robots.push(newRobot);
+      //game.add.existing(newRobot);
+      this.robots.add(newRobot);
 
       var baseSpeed = 100
       var speedX = 0
@@ -267,6 +281,7 @@ export default class extends Phaser.State {
 
       var direction = new Phaser.Point(speedX, speedY)
       newRobot.body.velocity = direction
+      newRobot.body.bounce.set(5);
 
       newRobot.outOfBoundsKill = true;
     }
