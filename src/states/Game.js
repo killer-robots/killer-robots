@@ -103,7 +103,7 @@ export default class extends Phaser.State {
     game.physics.arcade.collideGroupVsSelf(this.robots, this.robotCollideRobot,  this.processHandler, this);
 
     //Robot-collisions
-    game.physics.arcade.collide(this.robots, this.asteroids, this.asteroidCollideOther, this.processHandler, this);
+    //game.physics.arcade.collide(this.robots, this.asteroids, this.asteroidCollideOther, this.processHandler, this);
   }
 
   playerCollideRobot(player, robot) {
@@ -117,35 +117,44 @@ export default class extends Phaser.State {
   }
 
   asteroidCollideOther (asteroid1, other) {
-    this.explosion1.play();
-    var explosion = this.explosions.getFirstExists(false);
-    explosion.reset((asteroid1.body.x + other.body.x) / 2,
-      (asteroid1.body.y + other.body.y) / 2);
-    asteroid1.destroy();
-    other.destroy();
-    explosion.play('kaboom', 30, false, true);
+    if (typeof asteroid1 !== 'undefined' && asteroid1 &&
+        typeof other !== 'undefined' && other) {
+      this.explosion1.play();
+      var explosion = this.explosions.getFirstExists(false);
+      explosion.reset((asteroid1.body.x + other.body.x) / 2,
+        (asteroid1.body.y + other.body.y) / 2);
+      asteroid1.destroy();
+      other.destroy();
+      explosion.play('kaboom', 30, false, true);
+    }
   }
 
   bulletCollideAsteroidHandler (bullet, asteroid) {
-    this.explosion1.play();
-    var explosion = this.explosions.getFirstExists(false);
-    if (!explosion) return;
-    explosion.reset(object.body.x, object.body.y);
-    object.destroy();
-    explosion.play('kaboom', 30, false, true);
+    if (typeof bullet !== 'undefined' && bullet &&
+        typeof asteroid !== 'undefined' && asteroid) {
+      this.explosion1.play();
+      var explosion = this.explosions.getFirstExists(false);
+      if (!explosion) return;
+      explosion.reset(object.body.x, object.body.y);
+      object.destroy();
+      explosion.play('kaboom', 30, false, true);
+    }
   }
 
   playerCollideAsteroid (player, asteroid) {
-    this.explosion1.play();
-    this.player.health -= player.maxHealth/10;
-    if (this.player.health <= 0) {
-      //TODO:  Kill player and explode ship
-    }
+    if (typeof player !== 'undefined' && player &&
+        typeof asteroid !== 'undefined' && asteroid) {
+      this.explosion1.play();
+      this.player.health -= player.maxHealth / 10;
+      if (this.player.health <= 0) {
+        //TODO:  Kill player and explode ship
+      }
 
-    var explosion = this.explosions.getFirstExists(false);
-    explosion.reset(asteroid.body.x, asteroid.body.y);
-    asteroid.destroy();
-    explosion.play('kaboom', 30, false, true);
+      var explosion = this.explosions.getFirstExists(false);
+      explosion.reset(asteroid.body.x, asteroid.body.y);
+      asteroid.destroy();
+      explosion.play('kaboom', 30, false, true);
+    }
   }
 
   playerCollideCoin (player, coin) {
@@ -196,7 +205,7 @@ export default class extends Phaser.State {
     }
 
     addAsteroid() {
-      var chanceOfAsteroid = 0.01;
+      var chanceOfAsteroid = 0.1;
 
       var asteroidRandom = Math.random();
       if (asteroidRandom < chanceOfAsteroid) {
