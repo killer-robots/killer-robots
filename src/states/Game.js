@@ -1,4 +1,3 @@
-/* globals __DEV__ */
 import Phaser from 'phaser'
 import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
@@ -42,12 +41,26 @@ export default class extends Phaser.State {
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
 
+    this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var healthTextImage = game.add.image(380, 5, this.healthText)
+    healthTextImage.tint = 0x28bb35
+    healthTextImage.fixedToCamera = true
+
     this.asteroids = game.add.physicsGroup();
-    this.robots = game.add.physicsGroup();
     this.explosions = game.add.group();
-    this.explosions.createMultiple(30, 'kaboom');
+    this.explosions.createMultiple(10, 'kaboom');
     this.explosions.forEach(this.setupExplosion, this);
+
+      // Set up a weapon
+      this.weapon = game.add.weapon(50, 'bullet')
+      this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+      this.weapon.bulletSpeed = 700;
+      this.weapon.fireRate = 100;
+      this.weapon.trackSprite(this.player, 0, 0, true);
+
+
   }
+
   setupExplosion(explosion) {
     explosion.anchor.x = 0.5;
     explosion.anchor.y = 0.5;
@@ -55,44 +68,42 @@ export default class extends Phaser.State {
   }
 
   update() {
+
+      if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+          console.log('b');
+          this.weapon.fire();
+      }
     this.addAsteroid();
-    this.addRobot();
-
-    if (game.physics.arcade.collide(this.player, this.asteroids, this.asteroidCollisionPlayerHandler, this.processHandler, this))
-    {
-        console.log('asteroid hit player');
-    }
-
-    if (game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideAsteroidHandler,  this.processHandler, this))
-    {
-      console.log('asteroid hit asteroid!');
-    }
-  }
-
-  asteroidCollideAsteroidHandler (asteroid1, asteroid2) {
-    var explosion = this.explosions.getFirstExists(false);
-    explosion.reset((asteroid1.body.x + asteroid2.body.x) / 2,
-      (asteroid1.body.y + asteroid2.body.y) / 2);
-    asteroid1.destroy();
-    asteroid2.destroy();
-    explosion.play('kaboom', 30, false, true);
+      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this)) {
+          console.log('boom');
+      }
+      if (game.physics.arcade.collide(this.player.bullet, this.asteroids, this.collisionHandler, this.processHandler, this)) {
+          console.log('boom');
+      }
   }
 
   processHandler (player, asteroids) {
     return true;
   }
 
-  asteroidCollisionPlayerHandler (player, asteroid) {
-    this.player.health -= player.maxHealth/10;
-    if (this.player.health <= 0) {
-      //TODO:  Kill player and explode ship
+    processHandler (bullet, asteroids) {
+        return true;
     }
 
+  collisionHandler (bullet, asteroid) {
     var explosion = this.explosions.getFirstExists(false);
     explosion.reset(asteroid.body.x, asteroid.body.y);
     asteroid.destroy();
     explosion.play('kaboom', 30, false, true);
   }
+
+collisionHandler (player, asteroid) {
+    this.player.health -= player.maxHealth/10;
+    var explosion = this.explosions.getFirstExists(false);
+    explosion.reset(asteroid.body.x, asteroid.body.y);
+    asteroid.destroy();
+    explosion.play('kaboom', 30, false, true);
+}
 
 
   addPlanets() {
@@ -112,40 +123,42 @@ export default class extends Phaser.State {
     }
   }
 
-  getRandomBorderSpawnPosition(randomValue, randomChance) {
-    var xPos = 0;
-    var yPos = 0;
-    if (randomValue <= randomChance / 4)
-    {
-      xPos = this.world.width * Math.random();
-      yPos = 0;
-    }
-    else if (randomValue <= randomChance / 2) {
-      xPos = this.world.width * Math.random();
-      yPos = this.world.height-1;
-    }
-    else if (randomValue <= (randomChance*3) /4 ) {
-      xPos = 0;
-      yPos = this.world.height * Math.random();
-    }
-    else {
-      xPos = this.world.width-1;
-      yPos = this.world.height * Math.random();
-    }
+  addAsteroid() {
+    var chanceOfAsteroid = 0.1;
 
-    return new Phaser.Point(xPos, yPos);
-  }
+    var asteroidRandom = Math.random();
+    if (asteroidRandom < chanceOfAsteroid) {
+      var xPos = 0;
+      var yPos = 0;
+      if (asteroidRandom <= chanceOfAsteroid / 4)
+      {
+        xPos = this.world.width * Math.random();
+        yPos = 0;
+      }
+      else if (asteroidRandom <= chanceOfAsteroid / 2) {
+        xPos = this.world.width * Math.random();
+        yPos = this.world.height-1;
+      }
+      else if (asteroidRandom <= (chanceOfAsteroid*3) /4 ) {
+        xPos = 0;
+        yPos = this.world.height * Math.random();
+      }
+      else {
+        xPos = this.world.width-1;
+        yPos = this.world.height * Math.random();
+      }
 
-  getInitialBorderSpawnVelocity(pos) {
+      var newAsteroid =  this.asteroids.create(xPos, yPos, 'asteroid', 0);
+
       var baseSpeed = 100
       var speedX = 0
       var speedY = 0
-      if (pos.x == 0) {
+      if (xPos== 0) {
         speedX = baseSpeed * Math.random()
       } else {
         speedX = -baseSpeed * Math.random()
       }
-      if (pos.y == 0) {
+      if (yPos == 0) {
         speedY = baseSpeed * Math.random()
       } else {
         speedY = -baseSpeed * Math.random()
@@ -153,17 +166,8 @@ export default class extends Phaser.State {
 
       var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
 
-      return new Phaser.Point(speedX, speedY)
-  }
-
-  addAsteroid() {
-    var chanceOfAsteroid = 0.1;
-
-    var asteroidRandom = Math.random();
-    if (asteroidRandom < chanceOfAsteroid) {
-      var pos = this.getRandomBorderSpawnPosition(asteroidRandom, chanceOfAsteroid);
-      var newAsteroid =  this.asteroids.create(pos.x, pos.y, 'asteroid', 0);
-      newAsteroid.body.velocity = this.getInitialBorderSpawnVelocity(pos);
+      var direction = new Phaser.Point(speedX, speedY)
+      newAsteroid.body.velocity = direction
 
       var randomAngle = 45 + Phaser.Math.radToDeg(
           Phaser.Point.angle(
@@ -173,23 +177,19 @@ export default class extends Phaser.State {
               newAsteroid.y + newAsteroid.body.velocity.y)
           )
         )
-      newAsteroid.body.setCircle(10, 5, 5);
-      newAsteroid.anchor.x = 0.5;
-      newAsteroid.anchor.y = 0.5;
       newAsteroid.angle = randomAngle;
       newAsteroid.outOfBoundsKill = true;
     }
   }
 
-  addRobot() {
-    var chanceOfRobot = 0.1;
 
-    var robotRandom = Math.random();
-    if (robotRandom < chanceOfRobot) {
-      var pos = this.getRandomBorderSpawnPosition(robotRandom, chanceOfRobot);
-      var newRobot = this.robots.create(pos.x, pos.y, 'robot', 0);
-      newRobot.body.velocity = this.getInitialBorderSpawnVelocity(pos);
-      newRobot.outOfBoundsKill = true;
-    }
+  render () {
+    var x = 32
+    var y = 32
+
+    this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
+
+      this.healthText.text = 'shields:' + Math.round(this.player.health / this.player.maxHealth * 100) + '%'
   }
+
 }
