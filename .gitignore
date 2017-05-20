@@ -4,3 +4,10 @@ dist/
 nbproject/
 .DS_Store
 npm-debug.log*
+.idea/codeStyleSettings.xml
+.idea/killer-robots.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/inspectionProfiles/Project_Default.xml
