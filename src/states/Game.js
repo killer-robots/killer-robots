@@ -1,16 +1,17 @@
 import Phaser from 'phaser'
 import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
+import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
 import Coin from '../sprites/Coin'
 export default class extends Phaser.State {
   init () {}
   preload () {}
-  
+
   create () {
     //Setup physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
-	
+
     // Set up game input.
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
@@ -48,6 +49,7 @@ export default class extends Phaser.State {
     healthTextImage.fixedToCamera = true
 
     this.asteroids = game.add.physicsGroup();
+    this.robots = [];
     this.explosions = game.add.group();
     this.explosions.createMultiple(30, 'kaboom');
     this.explosions.forEach(this.setupExplosion, this);
@@ -60,7 +62,6 @@ export default class extends Phaser.State {
     this.weapon.trackSprite(this.player, 0, 0, true);
 
     this.CoinGroup = this.game.add.physicsGroup();
-
   }
 
   setupExplosion(explosion) {
@@ -69,12 +70,32 @@ export default class extends Phaser.State {
     explosion.animations.add('kaboom');
   }
 
+  update() {
+    if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+      this.weapon.fire();
+    }
+
+    this.addAsteroid();
+    this.addRobot();
+
+    game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this)
+    game.physics.arcade.collide(this.player, this.robots, this.collisionHandler, this.processHandler, this)
+    game.physics.arcade.collide(this.player.bullet, this.asteroids, this.collisionHandler, this.processHandler, this)
+    game.physics.arcade.collide(this.player.bullet, this.robots, this.collisionHandler, this.processHandler, this)
+  }
+
   processHandler (player, asteroids) {
     return true;
   }
 
   update() {
     this.addAsteroid();
+    this.addRobot();
+    this.robots.forEach(robot => {
+      if (robot.exists) {
+        robot.update()
+      }
+    })
 	  this.addCoin();
 
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
@@ -95,9 +116,10 @@ export default class extends Phaser.State {
     {
       console.log('asteroid hit asteroid!');
     }
-
-
+    game.physics.arcade.collide(this.player, this.robots, this.collisionHandler, this.processHandler, this)
+    game.physics.arcade.collide(this.player.bullet, this.robots, this.collisionHandler, this.processHandler, this)
   }
+
   asteroidCollideAsteroidHandler (asteroid1, asteroid2) {
     var explosion = this.explosions.getFirstExists(false);
     explosion.reset((asteroid1.body.x + asteroid2.body.x) / 2,
@@ -110,8 +132,9 @@ export default class extends Phaser.State {
 
   bulletCollideAsteroidHandler (bullet, asteroid) {
     var explosion = this.explosions.getFirstExists(false);
-    explosion.reset(asteroid.body.x, asteroid.body.y);
-    asteroid.destroy();
+    if (!explosion) return;
+    explosion.reset(object.body.x, object.body.y);
+    object.destroy();
     explosion.play('kaboom', 30, false, true);
   }
 
@@ -131,7 +154,6 @@ export default class extends Phaser.State {
     //  If the ship collides with a coin it gets eaten :)
     coin.kill();
   }
-
 
   addPlanets() {
     const planetDensity = 0.000004
@@ -209,6 +231,57 @@ export default class extends Phaser.State {
     }
   }
 
+  addRobot() {
+    var chanceOfAsteroid = 0.1;
+
+    var asteroidRandom = Math.random();
+    if (asteroidRandom < chanceOfAsteroid) {
+      var xPos = 0;
+      var yPos = 0;
+      if (asteroidRandom <= chanceOfAsteroid / 4)
+      {
+        xPos = this.world.width * Math.random();
+        yPos = 0;
+      }
+      else if (asteroidRandom <= chanceOfAsteroid / 2) {
+        xPos = this.world.width * Math.random();
+        yPos = this.world.height-1;
+      }
+      else if (asteroidRandom <= (chanceOfAsteroid*3) /4 ) {
+        xPos = 0;
+        yPos = this.world.height * Math.random();
+      }
+      else {
+        xPos = this.world.width-1;
+        yPos = this.world.height * Math.random();
+      }
+
+      var newRobot = new Robot({ game: this, x: xPos, y: yPos, asset: 'robot' });
+      this.robots.push(newRobot);
+      game.add.existing(newRobot);
+
+      var baseSpeed = 100
+      var speedX = 0
+      var speedY = 0
+      if (xPos== 0) {
+        speedX = baseSpeed * Math.random()
+      } else {
+        speedX = -baseSpeed * Math.random()
+      }
+      if (yPos == 0) {
+        speedY = baseSpeed * Math.random()
+      } else {
+        speedY = -baseSpeed * Math.random()
+      }
+
+      var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
+
+      var direction = new Phaser.Point(speedX, speedY)
+      newRobot.body.velocity = direction
+
+      newRobot.outOfBoundsKill = true;
+    }
+  }
 
   render () {
     var x = 32
