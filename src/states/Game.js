@@ -42,6 +42,13 @@ export default class extends Phaser.State {
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
 
+
+
+      this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+      var healthTextImage = game.add.image(380, 5, this.healthText)
+      healthTextImage.tint = 0x28bb35
+      healthTextImage.fixedToCamera = true
+
     this.asteroids = game.add.physicsGroup();
     this.explosions = game.add.group();
     this.explosions.createMultiple(10, 'kaboom');
@@ -157,6 +164,8 @@ export default class extends Phaser.State {
     var y = 32
 
     this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
+
+      this.healthText.text = 'shields:' + Math.round(this.player.health / this.player.maxHealth * 100) + '%'
   }
 
 }

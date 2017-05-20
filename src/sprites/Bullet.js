@@ -12,7 +12,7 @@ export default class extends Phaser.Sprite {
         this.lifespan = 2000
         this.body.drag.set(50)
         this.rotation = rotation
-        game.physics.arcade.accelerationFromRotation(this.rotation, 520, this.body.velocity)
+        game.physics.arcade.accelerationFromRotation(this.rotation, 700, this.body.velocity)
     }
 
 }
