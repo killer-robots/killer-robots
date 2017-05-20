@@ -59,6 +59,12 @@ export default class extends Phaser.State {
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
 
+    this.sun = game.add.sprite(1000, 1000, 'sun');
+    this.sun.anchor.x = 0.5;
+    this.sun.anchor.y = 0.5;
+    this.sun.animations.add('sun');
+    this.sun.play('sun', 7, true, false);
+
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
     this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
