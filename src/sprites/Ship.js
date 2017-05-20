@@ -31,9 +31,9 @@ export default class extends Phaser.Sprite {
     }
 
     if (game.cursors.left.isDown) {
-      this.body.angularVelocity = -300
+      this.body.angularVelocity = -250
     } else if (game.cursors.right.isDown) {
-      this.body.angularVelocity = 300
+      this.body.angularVelocity = 250
     } else {
       this.body.angularVelocity = 0
     }
