@@ -92,6 +92,9 @@ export default class extends Phaser.State {
     this.coin1 = game.add.audio('coin1');
     this.fuel1 = game.add.audio('fuel1');
       this.med1 = game.add.audio('med1');
+    this.musics = [game.add.audio('mars', 0.5, true)];
+
+    this.musics[0].play();
   }
 
 
