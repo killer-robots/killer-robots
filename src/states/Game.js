@@ -38,6 +38,10 @@ export default class extends Phaser.State {
     this.addPlanets()
     this.game.add.existing(this.player);
 
+    this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var fuelTextImage = game.add.image(5, 5, this.fuelText)
+    fuelTextImage.tint = 0xFF7766
+    fuelTextImage.fixedToCamera = true
   }
 
   update() {
@@ -45,15 +49,8 @@ export default class extends Phaser.State {
 
   }
 
-
   render () {
-    var x = 32
-    var y = 32
-
-    // TODO: Use a proper font for this, not 'game.debug'.
-    this.game.debug.start(x, y);
-    this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
-    this.game.debug.stop();
+    this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
   }
 
   addPlanets() {
