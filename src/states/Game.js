@@ -4,6 +4,7 @@ import Asteroid from '../sprites/Asteroid'
 import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
 import Coin from '../sprites/Coin'
+
 export default class extends Phaser.State {
   init () {}
   preload () {}
@@ -44,7 +45,7 @@ export default class extends Phaser.State {
     fuelTextImage.fixedToCamera = true
 
     this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-    var healthTextImage = game.add.image(380, 5, this.healthText)
+    var healthTextImage = game.add.image(362, 5, this.healthText)
     healthTextImage.tint = 0x28bb35
     healthTextImage.fixedToCamera = true
 
@@ -62,6 +63,9 @@ export default class extends Phaser.State {
     this.weapon.trackSprite(this.player, 0, 0, true);
 
     this.CoinGroup = this.game.add.physicsGroup();
+
+    this.barGraphics = game.add.graphics(0, 0)
+    this.barGraphics.fixedToCamera = true
 
     // Audio
     this.laser1 = game.add.audio('laser1');
@@ -171,12 +175,31 @@ export default class extends Phaser.State {
     }
   }
 
-  render () {
-    var x = 32
-    var y = 32
+  drawBar(x, y, percentage) {
+    var maxWidth = 150
+    var width = Math.ceil(percentage * maxWidth)
+    var height = 20
+    var borderSize = 2
 
-    this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
-    this.healthText.text = 'shields:' + Math.round(this.player.health / this.player.maxHealth * 100) + '%'
+    var color = Phaser.Color.HSLtoRGB(percentage * 0.35, 0.75, 0.45)
+    color = color.r * 0x010000 + color.g * 0x000100 + color.b * 0x000001
+
+    this.barGraphics.beginFill(0);
+    this.barGraphics.drawRect(x, y, maxWidth, height)
+    this.barGraphics.beginFill(color);
+    this.barGraphics.drawRect(x + borderSize, y + borderSize,
+                              Math.max(0, width - borderSize * 2), height - borderSize * 2)
+  }
+
+  render () {
+    this.barGraphics.clear();
+    var y = 7
+
+    this.fuelText.text = 'fuel:'
+    this.drawBar(150, y, this.player.fuel / this.player.fuelMax)
+
+    this.healthText.text = 'shields:'
+    this.drawBar(600, y, this.player.health / this.player.maxHealth)
   }
 
   addCoin() {
