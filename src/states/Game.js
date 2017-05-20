@@ -49,7 +49,7 @@ export default class extends Phaser.State {
 
   addPlanets() {
     const asteroidCount = 2
-    this.planets = []
+    this.game.planets = []
 
     for (var i = 0; i < asteroidCount; i++) {
       var planet = new Planet({
@@ -58,7 +58,7 @@ export default class extends Phaser.State {
         y: this.world.randomY,
         asset: Phaser.ArrayUtils.getRandomItem(planets)
       })
-      this.planets.push(planet)
+      this.game.planets.push(planet)
       this.game.add.existing(planet)
     }
   }
