@@ -54,10 +54,11 @@ export default class extends Phaser.State {
   }
 
   addPlanets() {
-    const asteroidCount = 2
+    const planetDensity = 0.000004
+    const planetCount = this.world.width * this.world.height * planetDensity
     this.game.planets = []
 
-    for (var i = 0; i < asteroidCount; i++) {
+    for (var i = 0; i < planetCount; i++) {
       var planet = new Planet({
         game: this,
         x: this.world.randomX,
