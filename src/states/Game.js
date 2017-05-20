@@ -67,6 +67,7 @@ export default class extends Phaser.State {
 
     this.CoinGroup = this.game.add.physicsGroup();
     this.FuelGroup = this.game.add.physicsGroup();
+    this.MedpackGroup = this.game.add.physicsGroup();
 
     this.barGraphics = game.add.graphics(0, 0)
     this.barGraphics.fixedToCamera = true
@@ -77,6 +78,7 @@ export default class extends Phaser.State {
     this.explosion1 = game.add.audio('explosion1');
     this.coin1 = game.add.audio('coin1');
     this.fuel1 = game.add.audio('fuel1');
+      this.med1 = game.add.audio('med1');
   }
 
 
@@ -86,6 +88,7 @@ export default class extends Phaser.State {
 
 	  this.addCoin();
 	  this.addFuel();
+	  this.addMedpack();
 
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       console.log('b');
@@ -97,6 +100,9 @@ export default class extends Phaser.State {
 
     //Fuel collision
       game.physics.arcade.overlap(this.player, this.FuelGroup, this.playerCollideFuel, null, this);
+
+      //Health collision
+      game.physics.arcade.overlap(this.player, this.MedpackGroup, this.playerCollideMedpack, null, this);
 
     //Player collisions
     game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
@@ -177,6 +183,12 @@ export default class extends Phaser.State {
         this.player.fuel += 200000;
         fuel.kill();
     }
+    playerCollideMedpack (player, medpack) {
+        //  If the ship collides with a coin it gets eaten :)
+        this.med1.play();
+        this.player.health += 25;
+        medpack.kill();
+    }
 
   addPlanets() {
     const planetDensity = 0.000004
@@ -250,6 +262,18 @@ export default class extends Phaser.State {
                 var xPos = this.world.width * Math.random();
                 var yPos = this.world.width * Math.random();
                 var newFuel = this.FuelGroup.create(xPos, yPos, 'fuel');
+            }
+        }
+    }
+
+    addMedpack() {
+        if (this.MedpackGroup.total < 5) {
+            var chanceOfMedpack = .1;
+            var medpackRandom = Math.random();
+            if (medpackRandom < chanceOfMedpack) {
+                var xPos = this.world.width * Math.random();
+                var yPos = this.world.width * Math.random();
+                var newMedpack = this.MedpackGroup.create(xPos, yPos, 'medpack');
             }
         }
     }

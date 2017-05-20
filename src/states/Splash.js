@@ -24,6 +24,7 @@ export default class extends Phaser.State {
     this.load.image('bullet', 'assets/images/bullet.png')
     this.load.image('green-bullet', 'assets/images/green-bullet.png')
       this.load.image('fuel','assets/images/gas.png' )
+      this.load.image('medpack','assets/images/medpack.png' )
 
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
