@@ -27,10 +27,15 @@ export default class extends Phaser.State {
 
     this.game.add.existing(this.background)
     this.game.add.existing(this.player);
+
+
+
+
   }
 
   update() {
     this.addAsteroid();
+
   }
 
 
