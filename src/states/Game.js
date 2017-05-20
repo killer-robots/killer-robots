@@ -59,7 +59,7 @@ export default class extends Phaser.State {
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
 
-    this.sun = game.add.sprite(1000, 1000, 'sun');
+    this.sun = game.add.sprite(this.world.width*.8, this.world.height*.2, 'sun');
     this.sun.anchor.x = 0.5;
     this.sun.anchor.y = 0.5;
     this.sun.animations.add('sun');
@@ -197,8 +197,8 @@ export default class extends Phaser.State {
     for (var i = 0; i < blackHoleCount; i++) {
       var blackHole = new BlackHole({
         game: this,
-        x: this.world.randomX,
-        y: this.world.randomY,
+        x: this.world.width*.2,
+        y: this.world.height*.8,
         asset: 'blackhole'
       })
       this.game.blackHoles.push(blackHole)
