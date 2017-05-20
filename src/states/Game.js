@@ -42,19 +42,26 @@ export default class extends Phaser.State {
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
 
-
-
-      this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-      var healthTextImage = game.add.image(380, 5, this.healthText)
-      healthTextImage.tint = 0x28bb35
-      healthTextImage.fixedToCamera = true
+    this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var healthTextImage = game.add.image(380, 5, this.healthText)
+    healthTextImage.tint = 0x28bb35
+    healthTextImage.fixedToCamera = true
 
     this.asteroids = game.add.physicsGroup();
     this.explosions = game.add.group();
     this.explosions.createMultiple(10, 'kaboom');
     this.explosions.forEach(this.setupExplosion, this);
 
+      // Set up a weapon
+      this.weapon = game.add.weapon(50, 'bullet')
+      this.weapon.bulletKillType = Phaser.Weapon.KILL_WORLD_BOUNDS;
+      this.weapon.bulletSpeed = 700;
+      this.weapon.fireRate = 100;
+      this.weapon.trackSprite(this.player, 0, 0, true);
+
+
   }
+
   setupExplosion(explosion) {
     explosion.anchor.x = 0.5;
     explosion.anchor.y = 0.5;
@@ -62,9 +69,16 @@ export default class extends Phaser.State {
   }
 
   update() {
+
+      if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+          console.log('b');
+          this.weapon.fire();
+      }
     this.addAsteroid();
-      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this))
-      {
+      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this)) {
+          console.log('boom');
+      }
+      if (game.physics.arcade.collide(this.player.bullet, this.asteroids, this.collisionHandler, this.processHandler, this)) {
           console.log('boom');
       }
   }
@@ -73,13 +87,24 @@ export default class extends Phaser.State {
     return true;
   }
 
-  collisionHandler (player, asteroid) {
-    this.player.health -= player.maxHealth/10;
+    processHandler (bullet, asteroids) {
+        return true;
+    }
+
+  collisionHandler (bullet, asteroid) {
     var explosion = this.explosions.getFirstExists(false);
     explosion.reset(asteroid.body.x, asteroid.body.y);
     asteroid.destroy();
     explosion.play('kaboom', 30, false, true);
   }
+
+collisionHandler (player, asteroid) {
+    this.player.health -= player.maxHealth/10;
+    var explosion = this.explosions.getFirstExists(false);
+    explosion.reset(asteroid.body.x, asteroid.body.y);
+    asteroid.destroy();
+    explosion.play('kaboom', 30, false, true);
+}
 
 
   addPlanets() {
