@@ -5,10 +5,8 @@ export default class extends Phaser.Sprite {
     super(game, x, y, asset)
 
     // Set up the physics for this asteroid.
-    debugger;
-    this.enableBody = true;
-
-    game.physics.enable(this, Phaser.Physics.ARCADE);
+    game.physics.enable(this, Phaser.Physics.ARCADE)
+    this.body.allowGravity = false
 
     var baseSpeed = 100
     var speedX = 0
@@ -38,7 +36,6 @@ export default class extends Phaser.Sprite {
         )
       )
     this.angle = randomAngle
-
     this.outOfBoundsKill = true
 
   }
