@@ -11,6 +11,7 @@ export default class extends Phaser.Sprite {
   }
 
   update () {
+    this.rotation += 0.002
   }
 
   applyGravityTo(object) {
