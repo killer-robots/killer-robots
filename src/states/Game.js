@@ -16,8 +16,9 @@ export default class extends Phaser.State {
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
-    this.background = new Phaser.TileSprite(game, 0, 0, 800, 600, 'background')
+    this.background = new Phaser.TileSprite(game, 0, 0, 2048, 2048, 'background')
 
+    game.world.setBounds(0,0,2048,2048);
 
     this.player = new Ship({
       game: this,
@@ -25,6 +26,8 @@ export default class extends Phaser.State {
       y: this.world.centerY,
       asset: 'ship'
     })
+    this.player.body.collideWorldBounds = true;
+    game.camera.follow(this.player);
 
     this.game.add.existing(this.background)
     this.addPlanets()
@@ -33,7 +36,6 @@ export default class extends Phaser.State {
 
   update() {
     this.addAsteroid();
-
   }
 
 
