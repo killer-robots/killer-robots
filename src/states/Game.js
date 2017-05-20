@@ -103,6 +103,7 @@ export default class extends Phaser.State {
       console.log('asteroid hit asteroid!');
     }
     game.physics.arcade.collide(this.player, this.robots, this.collisionHandler, this.processHandler, this)
+    game.physics.arcade.collide(this.robots, this.robots, this.collisionHandler, this.processHandler, this)
     game.physics.arcade.collide(this.player.bullet, this.robots, this.collisionHandler, this.processHandler, this)
   }
 
