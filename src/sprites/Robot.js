@@ -23,14 +23,11 @@ export default class extends Phaser.Sprite {
     }
 
     var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
-
-    var direction = new Phaser.Point(speedX, speedY)
-    this.body.velocity = direction
+    this.body.velocity = new Phaser.Point(speedX, speedY)
 
     this.anchor.setTo(0.5)
-    game.physics.enable(this, Phaser.Physics.ARCADE)
     this.firerate = firerateMax
-    this.body.bounce.set(5);
+    this.body.bounce.set(1);
 
     this.outOfBoundsKill = true;
   }

@@ -92,18 +92,18 @@ export default class extends Phaser.State {
 
     //Player collisions
     game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
-    game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, this.processHandler, this);
+    game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
 
     //Bullets
-    game.physics.arcade.collide(this.player.bullet, this.asteroids, this.bulletCollideAsteroidHandler, this.processHandler, this);
-    game.physics.arcade.collide(this.player.bullet, this.robots, this.playerBulletCollideRobot, this.processHandler, this);
+    game.physics.arcade.collide(this.player.bullet, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
+    game.physics.arcade.collide(this.player.bullet, this.robots, this.playerBulletCollideRobot, null, this);
 
     //Self-collisions
-    game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  this.processHandler, this);
-    game.physics.arcade.collideGroupVsSelf(this.robots, this.robotCollideRobot,  this.processHandler, this);
+    game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  null, this);
+    game.physics.arcade.collideGroupVsSelf(this.robots, this.robotCollideRobot,  null, this);
 
-    //Robot-collisions
-    //game.physics.arcade.collide(this.robots, this.asteroids, this.asteroidCollideOther, this.processHandler, this);
+    //Robot/asteroid collisions
+    //game.physics.arcade.collide(this.asteroids, this.robots, this.asteroidCollideOther, null, this);
   }
 
   playerCollideRobot(player, robot) {
@@ -116,14 +116,13 @@ export default class extends Phaser.State {
 
   }
 
-  asteroidCollideOther (asteroid1, other) {
-    if (typeof asteroid1 !== 'undefined' && asteroid1 &&
+  asteroidCollideOther (asteroid, other) {
+    if (typeof asteroid !== 'undefined' && asteroid &&
         typeof other !== 'undefined' && other) {
-      this.explosion1.play();
       var explosion = this.explosions.getFirstExists(false);
-      explosion.reset((asteroid1.body.x + other.body.x) / 2,
-        (asteroid1.body.y + other.body.y) / 2);
-      asteroid1.destroy();
+      explosion.reset((asteroid.body.x + other.body.x) / 2,
+                      (asteroid.body.y + other.body.y) / 2);
+      asteroid.destroy();
       other.destroy();
       explosion.play('kaboom', 30, false, true);
     }
@@ -132,7 +131,6 @@ export default class extends Phaser.State {
   bulletCollideAsteroidHandler (bullet, asteroid) {
     if (typeof bullet !== 'undefined' && bullet &&
         typeof asteroid !== 'undefined' && asteroid) {
-      this.explosion1.play();
       var explosion = this.explosions.getFirstExists(false);
       if (!explosion) return;
       explosion.reset(object.body.x, object.body.y);
@@ -248,7 +246,4 @@ export default class extends Phaser.State {
       return {x:xPos, y:yPos};
     }
 
-  processHandler (player, asteroids) {
-    return true;
-  }
 }
