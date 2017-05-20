@@ -29,11 +29,17 @@ export default class extends Phaser.State {
     this.game.add.existing(this.background)
     this.addPlanets()
     this.game.add.existing(this.player);
+
+    this.asteroids = game.add.physicsGroup();
+      this.asteroids.create(game.rnd.between(100, 770), game.rnd.between(0, 570), 'asteroid', 0);
   }
 
   update() {
     this.addAsteroid();
-
+      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this))
+      {
+          console.log('boom');
+      }
   }
 
 
@@ -98,4 +104,15 @@ export default class extends Phaser.State {
       this.game.add.existing(newAsteroid);
     }
   }
+
+    processHandler (player, asteroids) {
+
+        return true;
+
+    }
+
+    collisionHandler (player, asteroids) {
+
+        this.player.fuel = 0;
+    }
 }
