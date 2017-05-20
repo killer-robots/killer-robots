@@ -71,6 +71,11 @@ export default class extends Phaser.State {
     this.weapon.bulletSpeed = 700;
     this.weapon.fireRate = 100;
     this.weapon.trackSprite(this.player, 0, 0, true);
+    var shootSignal = new Phaser.Signal();
+    shootSignal.add(function() {
+      this.laser1.play();
+    }, this);
+    this.weapon.onFire = shootSignal;
 
     this.CoinGroup = this.game.add.physicsGroup();
 
@@ -94,7 +99,6 @@ export default class extends Phaser.State {
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       console.log('b');
       this.weapon.fire();
-      this.laser1.play();
     }
     //Coin collection
     game.physics.arcade.overlap(this.player, this.CoinGroup, this.playerCollideCoin, null, this);
