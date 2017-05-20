@@ -44,10 +44,8 @@ export default class extends Phaser.State {
 
     this.asteroids = game.add.physicsGroup();
     this.explosions = game.add.group();
-    this.explosions.createMultiple(10, 'kaboom');
+    this.explosions.createMultiple(30, 'kaboom');
     this.explosions.forEach(this.setupExplosion, this);
-
-
   }
   setupExplosion(explosion) {
     explosion.anchor.x = 0.5;
@@ -57,19 +55,37 @@ export default class extends Phaser.State {
 
   update() {
     this.addAsteroid();
-      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this))
+      if (game.physics.arcade.collide(this.player, this.asteroids, this.asteroidCollisionPlayerHandler, this.processHandler, this))
       {
-          console.log('boom');
+          console.log('asteroid hit player');
       }
 
+      if (game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideAsteroidHandler,  this.processHandler, this))
+      {
+        console.log('asteroid hit asteroid!');
+      }
+
+  }
+
+  asteroidCollideAsteroidHandler (asteroid1, asteroid2) {
+    var explosion = this.explosions.getFirstExists(false);
+    explosion.reset((asteroid1.body.x + asteroid2.body.x) / 2,
+      (asteroid1.body.y + asteroid2.body.y) / 2);
+    asteroid1.destroy();
+    asteroid2.destroy();
+    explosion.play('kaboom', 30, false, true);
   }
 
   processHandler (player, asteroids) {
     return true;
   }
 
-  collisionHandler (player, asteroid) {
+  asteroidCollisionPlayerHandler (player, asteroid) {
     this.player.health -= player.maxHealth/10;
+    if (this.player.health <= 0) {
+      //TODO:  Kill player and explode ship
+    }
+
     var explosion = this.explosions.getFirstExists(false);
     explosion.reset(asteroid.body.x, asteroid.body.y);
     asteroid.destroy();
