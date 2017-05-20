@@ -3,15 +3,15 @@ import Phaser from 'phaser'
 import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
 import Planet, { planets } from '../sprites/Planet'
-
+import Coin from '../sprites/Coin'
 export default class extends Phaser.State {
   init () {}
   preload () {}
-
+  
   create () {
     //Setup physics
     game.physics.startSystem(Phaser.Physics.ARCADE);
-
+	
     // Set up game input.
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
@@ -32,10 +32,13 @@ export default class extends Phaser.State {
     this.game.add.existing(this.background)
     this.addPlanets()
     this.game.add.existing(this.player);
+	this.CoinGroup = this.game.add.physicsGroup();
   }
 
   update() {
     this.addAsteroid();
+	this.addCoin();
+	game.physics.arcade.overlap(this.player, this.CoinGroup, this.collisionHandler, null, this);
   }
 
 
@@ -96,8 +99,47 @@ export default class extends Phaser.State {
         y: yPos,
         asset: 'asteroid'
       })
-
       this.game.add.existing(newAsteroid);
     }
+  }
+  addCoin() {
+    var chanceOfCoin = 0.01;
+
+    var coinRandom = Math.random();
+    if (coinRandom < chanceOfCoin) {
+      var xPos = Math.random();
+      var yPos = Math.random();
+      if (coinRandom <= chanceOfCoin / 4)
+      {
+        xPos = this.world.width * Math.random();
+        yPos = Math.random();
+      }
+      else if (coinRandom <= chanceOfCoin / 2) {
+        xPos = this.world.width * Math.random()+100;
+        yPos = this.world.height* Math.random()+100;
+      }
+      else if (coinRandom <= (chanceOfCoin*3) /4 ) {
+        xPos = this.world.width * Math.random()+100;
+        yPos = this.world.height * Math.random()+100;
+      }
+      else {
+        xPos = this.world.width* Math.random()+100;
+        yPos = this.world.height * Math.random()+100;
+      }
+	  var newCoin = this.CoinGroup.create(xPos, yPos,'coin');
+	  /*var newCoin = new Coin({
+		  game: this,
+		  x: xPos,
+		  y: yPos,
+		  asset: 'coin'
+	  })*/
+	  newCoin.width =16;
+	  newCoin.height =16;
+      //this.game.add.existing(newCoin);
+    }
+  }
+  collisionHandler (player, coin) {
+    //  If the ship collides with a coin it gets eaten :)
+    coin.kill();
   }
 }
