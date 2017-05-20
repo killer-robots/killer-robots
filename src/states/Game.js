@@ -19,9 +19,7 @@ export default class extends Phaser.State {
     var worldWidth = 2000;
     var worldHeight = 2000;
 
-
     this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
-
 
     this.world.setBounds(0,0,worldWidth,worldHeight);
     this.player = new Ship({
@@ -38,20 +36,44 @@ export default class extends Phaser.State {
     this.addPlanets()
     this.game.add.existing(this.player);
 
+
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var fuelTextImage = game.add.image(5, 5, this.fuelText)
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
+
+    this.asteroids = game.add.physicsGroup();
+    this.explosions = game.add.group();
+    this.explosions.createMultiple(10, 'kaboom');
+    this.explosions.forEach(this.setupExplosion, this);
+
+  }
+  setupExplosion(explosion) {
+    explosion.anchor.x = 0.5;
+    explosion.anchor.y = 0.5;
+    explosion.animations.add('kaboom');
   }
 
   update() {
     this.addAsteroid();
-
+      if (game.physics.arcade.collide(this.player, this.asteroids, this.collisionHandler, this.processHandler, this))
+      {
+          console.log('boom');
+      }
   }
 
-  render () {
-    this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
+  processHandler (player, asteroids) {
+    return true;
   }
+
+  collisionHandler (player, asteroid) {
+    this.player.health -= player.maxHealth/10;
+    var explosion = this.explosions.getFirstExists(false);
+    explosion.reset(asteroid.body.x, asteroid.body.y);
+    asteroid.destroy();
+    explosion.play('kaboom', 30, false, true);
+  }
+
 
   addPlanets() {
     const planetDensity = 0.000004
@@ -71,7 +93,7 @@ export default class extends Phaser.State {
   }
 
   addAsteroid() {
-    var chanceOfAsteroid = 0.01;
+    var chanceOfAsteroid = 0.1;
 
     var asteroidRandom = Math.random();
     if (asteroidRandom < chanceOfAsteroid) {
@@ -95,14 +117,46 @@ export default class extends Phaser.State {
         yPos = this.world.height * Math.random();
       }
 
-      var newAsteroid = new Asteroid({
-        game: this,
-        x: xPos,
-        y: yPos,
-        asset: 'asteroid'
-      })
+      var newAsteroid =  this.asteroids.create(xPos, yPos, 'asteroid', 0);
 
-      this.game.add.existing(newAsteroid);
+      var baseSpeed = 100
+      var speedX = 0
+      var speedY = 0
+      if (xPos== 0) {
+        speedX = baseSpeed * Math.random()
+      } else {
+        speedX = -baseSpeed * Math.random()
+      }
+      if (yPos == 0) {
+        speedY = baseSpeed * Math.random()
+      } else {
+        speedY = -baseSpeed * Math.random()
+      }
+
+      var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
+
+      var direction = new Phaser.Point(speedX, speedY)
+      newAsteroid.body.velocity = direction
+
+      var randomAngle = 45 + Phaser.Math.radToDeg(
+          Phaser.Point.angle(
+            newAsteroid.position,
+            new Phaser.Point(
+              newAsteroid.x + newAsteroid.body.velocity.x,
+              newAsteroid.y + newAsteroid.body.velocity.y)
+          )
+        )
+      newAsteroid.angle = randomAngle;
+      newAsteroid.outOfBoundsKill = true;
     }
   }
+
+
+  render () {
+    var x = 32
+    var y = 32
+
+    this.fuelText.text = 'fuel:' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%'
+  }
+
 }
