@@ -85,6 +85,7 @@ export default class extends Phaser.State {
     this.addRobot();
 
 	  this.addCoin();
+	  this.addFuel();
 
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       console.log('b');
@@ -242,8 +243,8 @@ export default class extends Phaser.State {
     }
 
     addFuel() {
-        if (this.FuelGroup.total < 25) {
-            var chanceOfFuel = 1;
+        if (this.FuelGroup.total < 5) {
+            var chanceOfFuel = .1;
             var fuelRandom = Math.random();
             if (fuelRandom < chanceOfFuel) {
                 var xPos = this.world.width * Math.random();

@@ -38,7 +38,7 @@ export default class extends Phaser.Sprite {
       this.body.angularVelocity = 0
     }
 
-    this.fuel = Math.max(0, this.fuel - this.body.acceleration.getMagnitudeSq() / 1000)
+    this.fuel = Math.max(0, this.fuel - this.body.acceleration.getMagnitudeSq() / 500)
       this.firerate -= 1
 
     this.body.gravity.set(0, 0) // Reset and recalculate below.
