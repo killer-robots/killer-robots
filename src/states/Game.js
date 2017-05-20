@@ -2,6 +2,7 @@
 import Phaser from 'phaser'
 import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
+import Planet, { planets } from '../sprites/Planet'
 
 export default class extends Phaser.State {
   init () {}
@@ -26,11 +27,13 @@ export default class extends Phaser.State {
     })
 
     this.game.add.existing(this.background)
+    this.addPlanets()
     this.game.add.existing(this.player);
   }
 
   update() {
     this.addAsteroid();
+
   }
 
 
@@ -42,6 +45,22 @@ export default class extends Phaser.State {
     this.game.debug.start(x, y);
     this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
     this.game.debug.stop();
+  }
+
+  addPlanets() {
+    const asteroidCount = 2
+    this.planets = []
+
+    for (var i = 0; i < asteroidCount; i++) {
+      var planet = new Planet({
+        game: this,
+        x: this.world.randomX,
+        y: this.world.randomY,
+        asset: Phaser.ArrayUtils.getRandomItem(planets)
+      })
+      this.planets.push(planet)
+      this.game.add.existing(planet)
+    }
   }
 
   addAsteroid() {
