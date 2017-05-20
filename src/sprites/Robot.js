@@ -6,9 +6,33 @@ const firerateMax = 100
 export default class extends Phaser.Sprite {
   constructor ({ game, x, y, asset }) {
     super(game, x, y, asset)
+    game.physics.enable(this, Phaser.Physics.ARCADE)
+
+    var baseSpeed = 100
+    var speedX = 0
+    var speedY = 0
+    if (x== 0) {
+      speedX = baseSpeed * Math.random()
+    } else {
+      speedX = -baseSpeed * Math.random()
+    }
+    if (y == 0) {
+      speedY = baseSpeed * Math.random()
+    } else {
+      speedY = -baseSpeed * Math.random()
+    }
+
+    var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
+
+    var direction = new Phaser.Point(speedX, speedY)
+    this.body.velocity = direction
+
     this.anchor.setTo(0.5)
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.firerate = firerateMax
+    this.body.bounce.set(5);
+
+    this.outOfBoundsKill = true;
   }
 
   update () {

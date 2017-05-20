@@ -77,11 +77,7 @@ export default class extends Phaser.State {
   update() {
     this.addAsteroid();
     this.addRobot();
-    this.robots.forEach(robot => {
-      if (robot.exists) {
-        robot.update()
-      }
-    })
+
 	  this.addCoin();
 
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
@@ -171,122 +167,6 @@ export default class extends Phaser.State {
     }
   }
 
-  addAsteroid() {
-    var chanceOfAsteroid = 0.1;
-
-    var asteroidRandom = Math.random();
-    if (asteroidRandom < chanceOfAsteroid) {
-      var xPos = 0;
-      var yPos = 0;
-      if (asteroidRandom <= chanceOfAsteroid / 4)
-      {
-        xPos = this.world.width * Math.random();
-        yPos = 0;
-      }
-      else if (asteroidRandom <= chanceOfAsteroid / 2) {
-        xPos = this.world.width * Math.random();
-        yPos = this.world.height-1;
-      }
-      else if (asteroidRandom <= (chanceOfAsteroid*3) /4 ) {
-        xPos = 0;
-        yPos = this.world.height * Math.random();
-      }
-      else {
-        xPos = this.world.width-1;
-        yPos = this.world.height * Math.random();
-      }
-
-      var newAsteroid =  this.asteroids.create(xPos, yPos, 'asteroid', 0);
-
-      var baseSpeed = 100
-      var speedX = 0
-      var speedY = 0
-      if (xPos== 0) {
-        speedX = baseSpeed * Math.random()
-      } else {
-        speedX = -baseSpeed * Math.random()
-      }
-      if (yPos == 0) {
-        speedY = baseSpeed * Math.random()
-      } else {
-        speedY = -baseSpeed * Math.random()
-      }
-
-      var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
-
-      var direction = new Phaser.Point(speedX, speedY)
-      newAsteroid.body.velocity = direction
-
-      var randomAngle = 45 + Phaser.Math.radToDeg(
-            Phaser.Point.angle(
-            newAsteroid.position,
-            new Phaser.Point(
-              newAsteroid.x + newAsteroid.body.velocity.x,
-              newAsteroid.y + newAsteroid.body.velocity.y)
-          )
-        )
-      newAsteroid.body.setCircle(10, 5, 5);
-      newAsteroid.anchor.x = 0.5;
-      newAsteroid.anchor.y = 0.5;
-      newAsteroid.angle = randomAngle;
-      newAsteroid.outOfBoundsKill = true;
-    }
-  }
-
-  addRobot() {
-    var chanceOfAsteroid = 0.1;
-
-    var asteroidRandom = Math.random();
-    if (asteroidRandom < chanceOfAsteroid) {
-      var xPos = 0;
-      var yPos = 0;
-      if (asteroidRandom <= chanceOfAsteroid / 4)
-      {
-        xPos = this.world.width * Math.random();
-        yPos = 0;
-      }
-      else if (asteroidRandom <= chanceOfAsteroid / 2) {
-        xPos = this.world.width * Math.random();
-        yPos = this.world.height-1;
-      }
-      else if (asteroidRandom <= (chanceOfAsteroid*3) /4 ) {
-        xPos = 0;
-        yPos = this.world.height * Math.random();
-      }
-      else {
-        xPos = this.world.width-1;
-        yPos = this.world.height * Math.random();
-      }
-
-      var newRobot = new Robot({ game: this, x: xPos, y: yPos, asset: 'robot' });
-      //this.robots.push(newRobot);
-      //game.add.existing(newRobot);
-      this.robots.add(newRobot);
-
-      var baseSpeed = 100
-      var speedX = 0
-      var speedY = 0
-      if (xPos== 0) {
-        speedX = baseSpeed * Math.random()
-      } else {
-        speedX = -baseSpeed * Math.random()
-      }
-      if (yPos == 0) {
-        speedY = baseSpeed * Math.random()
-      } else {
-        speedY = -baseSpeed * Math.random()
-      }
-
-      var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
-
-      var direction = new Phaser.Point(speedX, speedY)
-      newRobot.body.velocity = direction
-      newRobot.body.bounce.set(5);
-
-      newRobot.outOfBoundsKill = true;
-    }
-  }
-
   render () {
     var x = 32
     var y = 32
@@ -300,20 +180,58 @@ export default class extends Phaser.State {
 
     var coinRandom = Math.random();
     if (coinRandom < chanceOfCoin) {
-      var xPos = Math.random();
-      var yPos = Math.random();
-      xPos = this.world.width * Math.random();
-      yPos = this.world.width * Math.random();
-	    var newCoin = this.CoinGroup.create(xPos, yPos,'coin');
-	    newCoin.width =32;
-	    newCoin.height =32;
-      newCoin.animations.add('coin');
-
-      //  And this starts the animation playing by using its key ("run")
-      //  15 is the frame rate (15fps)
-      //  true means it will loop when it finishes
-	    newCoin.body.setCircle(10,5,5);//(radius,xoffset,yoffset);
-      newCoin.play('coin', 10, true, false);
+        var xPos = this.world.width * Math.random();
+        var yPos = this.world.width * Math.random();
+        var newCoin = this.CoinGroup.create(xPos, yPos, 'coin');
+        newCoin.width = 32;
+        newCoin.height = 32;
+        newCoin.animations.add('coin');
+        newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
+        newCoin.play('coin', 10, true, false);
+      }
     }
-  }
+
+    addAsteroid() {
+      var chanceOfAsteroid = 0.01;
+
+      var asteroidRandom = Math.random();
+      if (asteroidRandom < chanceOfAsteroid) {
+        var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
+        var newAsteroid = new Asteroid({ game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid' });
+        this.asteroids.add(newAsteroid);
+      }
+    }
+
+    addRobot() {
+      var chanceOfRobot = 0.1;
+
+      var robotRandom = Math.random();
+      if (robotRandom < chanceOfRobot) {
+        var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
+        var newRobot = new Robot({ game: this, x: newPosition.x, y: newPosition.y, asset: 'robot' });
+        this.robots.add(newRobot);
+      }
+    }
+
+    getPositionAlongEdge(randomSeed, seedRange) {
+      var xPos, yPos;
+      if (randomSeed <= seedRange / 4)
+      {
+        xPos = this.world.width * Math.random();
+        yPos = 0;
+      }
+      else if (randomSeed <= seedRange / 2) {
+        xPos = this.world.width * Math.random();
+        yPos = this.world.height-1;
+      }
+      else if (randomSeed <= (seedRange*3) /4 ) {
+        xPos = 0;
+        yPos = this.world.height * Math.random();
+      }
+      else {
+        xPos = this.world.width-1;
+        yPos = this.world.height * Math.random();
+      }
+      return {x:xPos, y:yPos};
+    }
 }
