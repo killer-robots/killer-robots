@@ -22,21 +22,10 @@ export default class extends Phaser.State {
     })
 
     this.game.add.existing(this.player);
-    //this.game.add.existing(this.asteroid);
   }
+
   update() {
-    var asteroidRandom = Math.random();
-    if (asteroidRandom > 0.90) {
-      var xRandom = Math.random();
-      var yRandom = Math.random();
-      var newAsteroid = new Asteroid({
-          game: this,
-          x: this.world.centerX - 50 + (500 * xRandom),
-          y: this.world.centerY- 50 + (100 * yRandom),
-          asset: 'asteroid'
-        })
-      this.game.add.existing(newAsteroid);
-    }
+    this.addAsteroid();
   }
 
 
@@ -45,4 +34,38 @@ export default class extends Phaser.State {
       this.game.debug.spriteInfo(this.player, 32, 32)
     }
   }
+
+  addAsteroid() {
+    var asteroidRandom = Math.random();
+    if (asteroidRandom > 0.90) {
+      var xPos = 0;
+      var yPos = 0;
+      if (asteroidRandom <= 0.925)
+      {
+        xPos = this.world.width * Math.random();
+        yPos = 0;
+      }
+      else if (asteroidRandom <= 0.95) {
+        xPos = this.world.width * Math.random();
+        yPos = this.world.height-1;
+      }
+      else if (asteroidRandom <= 0.975) {
+        xPos = 0;
+        yPos = this.world.height * Math.random();
+      }
+      else {
+        xPos = this.world.width-1;
+        yPos = this.world.height * Math.random();
+      }
+
+      var newAsteroid = new Asteroid({
+        game: this,
+        x: xPos,
+        y: yPos,
+        asset: 'asteroid'
+      })
+      this.game.add.existing(newAsteroid);
+    }
+  }
+
 }
