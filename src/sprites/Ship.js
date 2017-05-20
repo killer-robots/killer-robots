@@ -30,6 +30,12 @@ export default class extends Phaser.Sprite {
       this.body.acceleration.set(0)
     }
 
+    if (this.body.acceleration.isZero()) {
+      this.game.spaceWind.stop()
+    } else if (!this.game.spaceWind.isPlaying) {
+      this.game.spaceWind.play()
+    }
+
     if (game.cursors.left.isDown) {
       this.body.angularVelocity = -250
     } else if (game.cursors.right.isDown) {
