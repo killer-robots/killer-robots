@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { centerGameObjects } from '../utils'
+import { planets } from '../sprites/Planet'
 
 export default class extends Phaser.State {
   init () {}
@@ -17,6 +18,10 @@ export default class extends Phaser.State {
     this.load.image('ship', 'assets/images/ship.png')
     this.load.image('asteroid', 'assets/images/asteroid.png')
       this.load.image('bullet', 'assets/images/bullet.png')
+
+    for (let planet of planets) {
+      this.load.image(planet, 'assets/images/planets/' + planet + '.png')
+    }
   }
 
   create () {
