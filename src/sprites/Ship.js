@@ -16,6 +16,7 @@ export default class extends Phaser.Sprite {
     this.fuel = this.fuelMax = 1000000
     this.firerate = 10
     this.health = maxHealth
+
   }
 
   update () {

@@ -24,6 +24,7 @@ export default class extends Phaser.Sprite {
 
     var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
     this.body.velocity = new Phaser.Point(speedX, speedY)
+    this.body.setCircle(10, 0, 0);
 
     this.anchor.setTo(0.5)
     this.firerate = firerateMax
