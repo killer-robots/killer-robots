@@ -2,6 +2,7 @@
 import Phaser from 'phaser'
 import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
+import Planet, { planets } from '../sprites/Planet'
 
 export default class extends Phaser.State {
   init () {}
@@ -15,6 +16,9 @@ export default class extends Phaser.State {
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
 
+    this.background = new Phaser.TileSprite(game, 0, 0, 2048, 2048, 'background')
+
+    game.world.setBounds(0,0,2048,2048);
 
     this.player = new Ship({
       game: this,
@@ -22,7 +26,11 @@ export default class extends Phaser.State {
       y: this.world.centerY,
       asset: 'ship'
     })
+    this.player.body.collideWorldBounds = true;
+    game.camera.follow(this.player);
 
+    this.game.add.existing(this.background)
+    this.addPlanets()
     this.game.add.existing(this.player);
   }
 
@@ -32,8 +40,28 @@ export default class extends Phaser.State {
 
 
   render () {
-    if (__DEV__) {
-      this.game.debug.spriteInfo(this.player, 32, 32)
+    var x = 32
+    var y = 32
+
+    // TODO: Use a proper font for this, not 'game.debug'.
+    this.game.debug.start(x, y);
+    this.game.debug.line('fuel: ' + Math.round(this.player.fuel / this.player.fuelMax * 100) + '%');
+    this.game.debug.stop();
+  }
+
+  addPlanets() {
+    const asteroidCount = 2
+    this.game.planets = []
+
+    for (var i = 0; i < asteroidCount; i++) {
+      var planet = new Planet({
+        game: this,
+        x: this.world.randomX,
+        y: this.world.randomY,
+        asset: Phaser.ArrayUtils.getRandomItem(planets)
+      })
+      this.game.planets.push(planet)
+      this.game.add.existing(planet)
     }
   }
 
