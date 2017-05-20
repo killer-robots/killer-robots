@@ -42,6 +42,9 @@ export default class extends Phaser.Sprite {
       this.firerate -= 1
 
     this.body.gravity.set(0, 0) // Reset and recalculate below.
+    for (let blackHole of game.blackHoles) {
+      blackHole.applyGravityTo(this)
+    }
     for (let planet of game.planets) {
       planet.applyGravityTo(this)
     }

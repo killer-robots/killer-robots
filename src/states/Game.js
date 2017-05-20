@@ -3,6 +3,7 @@ import Ship from '../sprites/Ship'
 import Asteroid from '../sprites/Asteroid'
 import Robot from '../sprites/Robot'
 import Planet, { planets } from '../sprites/Planet'
+import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
 
 export default class extends Phaser.State {
@@ -36,6 +37,7 @@ export default class extends Phaser.State {
     this.camera.follow(this.player);
 
     this.game.add.existing(this.background)
+    this.addBlackHoles()
     this.addPlanets()
     this.game.add.existing(this.player);
 
@@ -57,6 +59,12 @@ export default class extends Phaser.State {
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
 
+    this.sun = game.add.sprite(this.world.width*.8, this.world.height*.2, 'sun');
+    this.sun.anchor.x = 0.5;
+    this.sun.anchor.y = 0.5;
+    this.sun.animations.add('sun');
+    this.sun.play('sun', 7, true, false);
+
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
       this.weapon.bulletLifespan = 500;
@@ -64,6 +72,11 @@ export default class extends Phaser.State {
     this.weapon.bulletSpeed = 700;
     this.weapon.fireRate = 100;
     this.weapon.trackSprite(this.player, 0, 0, true);
+    var shootSignal = new Phaser.Signal();
+    shootSignal.add(function() {
+      this.laser1.play();
+    }, this);
+    this.weapon.onFire = shootSignal;
 
     this.CoinGroup = this.game.add.physicsGroup();
     this.FuelGroup = this.game.add.physicsGroup();
@@ -93,7 +106,6 @@ export default class extends Phaser.State {
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       console.log('b');
       this.weapon.fire();
-      this.laser1.play();
     }
     //Coin collection
     game.physics.arcade.overlap(this.player, this.CoinGroup, this.playerCollideCoin, null, this);
@@ -204,6 +216,22 @@ export default class extends Phaser.State {
       })
       this.game.planets.push(planet)
       this.game.add.existing(planet)
+    }
+  }
+
+  addBlackHoles() {
+    const blackHoleCount = 1
+    this.game.blackHoles = []
+
+    for (var i = 0; i < blackHoleCount; i++) {
+      var blackHole = new BlackHole({
+        game: this,
+        x: this.world.width*.2,
+        y: this.world.height*.8,
+        asset: 'blackhole'
+      })
+      this.game.blackHoles.push(blackHole)
+      this.game.add.existing(blackHole)
     }
   }
 
