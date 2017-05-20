@@ -6,6 +6,7 @@ import Planet, { planets } from '../sprites/Planet'
 import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
 import Sun from '../sprites/Sun'
+import Flag from '../sprites/Flag'
 
 export default class extends Phaser.State {
   init () {}
@@ -40,13 +41,18 @@ export default class extends Phaser.State {
 
     //Populate world with objects
     this.game.add.existing(this.background)
-    this.addBlackHoles()
-    this.addPlanets()
-    this.addSun()
-    this.game.add.existing(this.player);
     this.asteroids = game.add.physicsGroup();
     this.robots = game.add.physicsGroup();
-    this.CoinGroup = this.game.add.physicsGroup();
+    this.coins = game.add.physicsGroup();
+    this.addBlackHoles()
+    this.addPlanets()
+    this.flags = game.add.physicsGroup();
+    this.addSun()
+    this.game.add.existing(this.player);
+
+    //Starting flag
+    var sun = this.game.suns[0];
+    this.addFlag(sun);
 
     //Add HUD info
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
@@ -59,17 +65,14 @@ export default class extends Phaser.State {
     healthTextImage.tint = 0x28bb35
     healthTextImage.fixedToCamera = true
 
-      this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-      var scoreTextImage = game.add.image(5, 5, this.scoreText)
-      scoreTextImage.tint = 0xFFD700
-      scoreTextImage.fixedToCamera = true
-
-    this.asteroids = game.add.physicsGroup();
-    this.robots = game.add.physicsGroup();
+    this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var scoreTextImage = game.add.image(5, 5, this.scoreText)
+    scoreTextImage.tint = 0xFFD700
+    scoreTextImage.fixedToCamera = true
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
-      this.weapon.bulletLifespan = 500;
+    this.weapon.bulletLifespan = 500;
     this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
     this.weapon.bulletSpeed = 700;
     this.weapon.fireRate = 100;
@@ -93,7 +96,7 @@ export default class extends Phaser.State {
     this.explosion1 = game.add.audio('explosion1');
     this.coin1 = game.add.audio('coin1');
     this.fuel1 = game.add.audio('fuel1');
-      this.med1 = game.add.audio('med1');
+    this.med1 = game.add.audio('med1');
   }
 
 
@@ -113,10 +116,10 @@ export default class extends Phaser.State {
     game.physics.arcade.overlap(this.player, this.CoinGroup, this.playerCollideCoin, null, this);
 
     //Fuel collision
-      game.physics.arcade.overlap(this.player, this.FuelGroup, this.playerCollideFuel, null, this);
+    game.physics.arcade.overlap(this.player, this.FuelGroup, this.playerCollideFuel, null, this);
 
-      //Health collision
-      game.physics.arcade.overlap(this.player, this.MedpackGroup, this.playerCollideMedpack, null, this);
+    //Health collision
+    game.physics.arcade.overlap(this.player, this.MedpackGroup, this.playerCollideMedpack, null, this);
 
     //Player collisions
     game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
@@ -133,6 +136,22 @@ export default class extends Phaser.State {
 
     //Robot/asteroid collisions
     game.physics.arcade.collide(this.asteroids, this.robots, this.asteroidCollideRobot, null, this);
+
+    //player flag collision
+    game.physics.arcade.collide(this.player, this.flags, this.playerCollideFlag, null, this);
+  }
+
+  playerCollideFlag(player, flag) {
+    var sun = this.game.suns[0];
+
+    if (flag.nearObject == sun)
+    {
+      var blackHole = this.game.blackHoles[0];
+      this.addFlag(blackHole);
+    } else {
+      this.addFlag(sun);
+    }
+    this.flags.remove(flag);
   }
 
   playerCollideRobot(player, robot) {
@@ -232,16 +251,18 @@ export default class extends Phaser.State {
     const blackHoleCount = 1
     this.game.blackHoles = []
 
-    var onTop = Math.random() > 0.5;
-    var onLeft = Math.random() > 0.5;
-
     for (var i = 0; i < blackHoleCount; i++) {
+      var onLeft = Math.random() > 0.5;;
+      var onTop = Math.random() > 0.5;
+
       var blackHole = new BlackHole({
         game: this,
         x: this.world.width*(onLeft ? 0.2 : 0.8),
         y: this.world.height*(onTop ? 0.2 : 0.8),
         asset: 'blackhole'
       })
+      blackHole.onTop = onTop;
+      blackHole.onLeft = onLeft;
       this.game.blackHoles.push(blackHole)
       this.game.add.existing(blackHole)
     }
@@ -252,8 +273,8 @@ export default class extends Phaser.State {
 
     //Check where black hole was placed
     var blackHole = this.game.blackHoles[0];
-    var onLeft = blackHole.x > this.world.width * 0.5;
-    var onTop = blackHole.y > this.world.height * 0.5;
+    var onLeft = !blackHole.onLeft;
+    var onTop = !blackHole.onTop;
 
     //Place sun in opposite corner
     var sun = new Sun({
@@ -266,6 +287,29 @@ export default class extends Phaser.State {
     this.game.add.existing(sun);
     sun.animations.add('sun');
     sun.play('sun', 7, true, false);
+
+    console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
+  }
+
+  addFlag(nearObject) {
+    var x = (nearObject.x > this.world.width/2 ? this.world.width*.9 : this.world.width*.1);
+    var y = (nearObject.y > this.world.height/2 ? this.world.height*.9 : this.world.height*.1);
+
+    console.log("Adding flag.  x: " + x + ".  y: " + y);
+
+    var newFlag = new Flag({
+      game: this.game,
+      x: x,
+      y: y,
+      asset: 'flag'
+    });
+
+    newFlag.nearObject = nearObject;
+
+    this.flags.add(newFlag);
+
+    newFlag.animations.add('flag');
+    newFlag.play('flag', 15, true, false);
   }
 
   drawBar(x, y, percentage) {
@@ -314,7 +358,7 @@ export default class extends Phaser.State {
       }
     }
   }
-  
+
   addFuel() {
       if (this.FuelGroup.total < 5) {
           var chanceOfFuel = .1;

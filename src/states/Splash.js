@@ -21,6 +21,7 @@ export default class extends Phaser.State {
     this.load.image('bullet', 'assets/images/bullet.png')
     game.load.spritesheet('kaboom', 'assets/images/explode.png', 128, 128);
     game.load.spritesheet('sun', 'assets/images/sun.png', 426, 426);
+    game.load.spritesheet('flag', 'assets/images/flag.png', 278, 202);
 
     this.load.image('bullet', 'assets/images/bullet.png')
     this.load.image('green-bullet', 'assets/images/green-bullet.png')
