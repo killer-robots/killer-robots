@@ -12,15 +12,14 @@ export default class extends Phaser.Sprite {
     var speedX = 0
     var speedY = 0
     if (this.x == 0) {
-      speedX = baseSpeed * Math.random();
+      speedX = baseSpeed * Math.random()
     } else {
-      speedX = -baseSpeed * Math.random();
+      speedX = -baseSpeed * Math.random()
     }
-    if (this.y == 0)
-    {
-      speedY = baseSpeed * Math.random();
-    }  else {
-      speedY = -baseSpeed * Math.random();
+    if (this.y == 0) {
+      speedY = baseSpeed * Math.random()
+    } else {
+      speedY = -baseSpeed * Math.random()
     }
 
     var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
@@ -42,6 +41,10 @@ export default class extends Phaser.Sprite {
   }
 
   update () {
+
+  }
+
+  explode () {
 
   }
 }

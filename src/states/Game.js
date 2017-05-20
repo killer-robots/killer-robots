@@ -8,11 +8,13 @@ export default class extends Phaser.State {
   preload () {}
 
   create () {
-    game.physics.startSystem(Phaser.Physics.ARCADE)
+    //Setup physics
+    game.physics.startSystem(Phaser.Physics.ARCADE);
 
     // Set up game input.
     game.cursors = game.input.keyboard.createCursorKeys()
     game.input.keyboard.addKeyCapture([ Phaser.Keyboard.SPACEBAR ])
+
 
     this.player = new Ship({
       game: this,
@@ -36,20 +38,22 @@ export default class extends Phaser.State {
   }
 
   addAsteroid() {
+    var chanceOfAsteroid = 0.01;
+
     var asteroidRandom = Math.random();
-    if (asteroidRandom > 0.90) {
+    if (asteroidRandom < chanceOfAsteroid) {
       var xPos = 0;
       var yPos = 0;
-      if (asteroidRandom <= 0.925)
+      if (asteroidRandom <= chanceOfAsteroid / 4)
       {
         xPos = this.world.width * Math.random();
         yPos = 0;
       }
-      else if (asteroidRandom <= 0.95) {
+      else if (asteroidRandom <= chanceOfAsteroid / 2) {
         xPos = this.world.width * Math.random();
         yPos = this.world.height-1;
       }
-      else if (asteroidRandom <= 0.975) {
+      else if (asteroidRandom <= (chanceOfAsteroid*3) /4 ) {
         xPos = 0;
         yPos = this.world.height * Math.random();
       }
@@ -64,8 +68,8 @@ export default class extends Phaser.State {
         y: yPos,
         asset: 'asteroid'
       })
+
       this.game.add.existing(newAsteroid);
     }
   }
-
 }
