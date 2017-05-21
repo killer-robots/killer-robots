@@ -88,8 +88,8 @@ export default class extends Phaser.State {
 
     this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
-    scoreTextImage.tint = 0xFFD700
-    scoreTextImage.fixedToCamera = true
+    highScoreTextImage.tint = 0xFF9905
+    highScoreTextImage.fixedToCamera = true
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
