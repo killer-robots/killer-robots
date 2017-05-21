@@ -4,7 +4,7 @@
     <list default="true" id="f43da75e-db87-424a-9e57-4a91ad7ec4e7" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sprites/Robot.js" afterPath="$PROJECT_DIR$/src/sprites/Robot.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sprites/Ship.js" afterPath="$PROJECT_DIR$/src/sprites/Ship.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/states/Game.js" afterPath="$PROJECT_DIR$/src/states/Game.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/sprites/Sun.js" afterPath="$PROJECT_DIR$/src/sprites/Sun.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/states/Splash.js" afterPath="$PROJECT_DIR$/src/states/Splash.js" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -18,18 +18,6 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Ship.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/sprites/Ship.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -42,14 +30,24 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Game.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Game.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/states/Game.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
-              <caret line="303" column="5" lean-forward="true" selection-start-line="303" selection-start-column="5" selection-end-line="303" selection-end-column="5" />
+            <state relative-caret-position="755">
+              <caret line="181" column="47" lean-forward="true" selection-start-line="181" selection-start-column="47" selection-end-line="181" selection-end-column="47" />
               <folding>
                 <element signature="e#0#27#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Sun.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/sprites/Sun.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="432">
+              <caret line="24" column="47" lean-forward="true" selection-start-line="24" selection-start-column="47" selection-end-line="24" selection-end-column="47" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -160,6 +158,7 @@
         <option value="$PROJECT_DIR$/src/sprites/Ship.js" />
         <option value="$PROJECT_DIR$/src/sprites/Robot.js" />
         <option value="$PROJECT_DIR$/src/states/Game.js" />
+        <option value="$PROJECT_DIR$/src/sprites/Sun.js" />
       </list>
     </option>
   </component>
@@ -623,7 +622,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="21847000" />
+    <option name="totallyTimeSpent" value="23683000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="-4" width="1301" height="772" extended-state="6" />
@@ -694,16 +693,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/states/Boot.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="true" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/states/Game.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2597">
@@ -1177,11 +1166,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/states/Game.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="303" column="5" lean-forward="true" selection-start-line="303" selection-start-column="5" selection-end-line="303" selection-end-column="5" />
+        <state relative-caret-position="755">
+          <caret line="181" column="47" lean-forward="true" selection-start-line="181" selection-start-column="47" selection-end-line="181" selection-end-column="47" />
           <folding>
             <element signature="e#0#27#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/sprites/Sun.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="24" column="47" lean-forward="true" selection-start-line="24" selection-start-column="47" selection-end-line="24" selection-end-column="47" />
+          <folding />
         </state>
       </provider>
     </entry>
