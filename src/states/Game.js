@@ -11,12 +11,12 @@ import Arrow from '../sprites/Arrow'
 
 const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
 
-const FlagPoints = 250;
-const RobotPoints = 50;
+const FlagPoints = 500;
+const RobotPoints = 5;
 const CoinPoints = 50;
 const AsteroidPoints = 25;
-const HealthPoints = 10;
-const FuelPoints = 10;
+const HealthPoints = 25;
+const FuelPoints = 25;
 
 export default class extends Phaser.State {
     init () {}
@@ -300,6 +300,7 @@ export default class extends Phaser.State {
     }
 
     missileHitsRobot(missile, robot) {
+      this.player.score += 100
       robot.health -= 100
         missile.kill()
         if (robot.health < 0) {
