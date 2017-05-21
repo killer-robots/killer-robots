@@ -9,6 +9,7 @@ export default class extends Phaser.Sprite {
     super(game, x, y, asset)
     game.physics.enable(this, Phaser.Physics.ARCADE)
 
+
     var baseSpeed = 100
     var speedX = 0
     var speedY = 0
@@ -25,16 +26,28 @@ export default class extends Phaser.Sprite {
 
     var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
     this.body.velocity = new Phaser.Point(speedX, speedY)
-    this.body.setCircle(10, 0, 0);
+
+    if (asset == 'robot') {
+      this.health = 50;
+      this.body.mass = 2
+      this.body.setCircle(10, 0, 0);
+      this.bigRobot = false;
+      console.log("small robot made");
+    } else {
+      this.health = 300;
+      this.body.mass = 10
+      this.body.setSize(105,169);
+      this.bigRobot = true;
+      console.log("big robot made");
+    }
 
     this.anchor.setTo(0.5)
     this.firerate = firerateMax
     this.body.bounce.set(1);
 
     this.outOfBoundsKill = true;
-    this.health = 100;
     this.alpha = 1;
-    this.body.mass = 2
+
   }
 
   update () {

@@ -84,7 +84,7 @@ export default class extends Phaser.Sprite {
 		this.game.notifyPlayerDied('You died! Game Over')
 		this.destroy();
     } else {
-		console.log("alpha: " + this.alpha)
+		// console.log("alpha: " + this.alpha)
 	}
 	if (this.health <= 0)
 	{

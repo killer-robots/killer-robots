@@ -9,6 +9,8 @@ import Sun from '../sprites/Sun'
 import Flag from '../sprites/Flag'
 import Arrow from '../sprites/Arrow'
 
+const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
+
 const FlagPoints = 250;
 const RobotPoints = 50;
 const CoinPoints = 50;
@@ -277,9 +279,19 @@ export default class extends Phaser.State {
             (player.body.x + robot.body.x) / 2,
             (player.body.y + robot.body.y) / 2
         );
+      if (robot.bigRobot) {
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y + robot.height
+        )
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y
+        )
+      }
 
-        this.player.health -= player.maxHealth/4;
-        this.robots.remove(robot);
+      this.player.health -= player.maxHealth/4;
+      robot.health -= 100;
     }
 
     robotBulletCollidePlayerHandler(player, bullet) {
@@ -288,17 +300,30 @@ export default class extends Phaser.State {
     }
 
     missileHitsRobot(missile, robot) {
-        this.makeExplosion(robot.body.x, robot.body.y);
-        this.robots.remove(robot)
+      robot.health -= 100
         missile.kill()
-        this.player.score += RobotPoints;
+        if (robot.health < 0) {
+            this.makeExplosion(robot.body.x, robot.body.y);
+            this.robots.remove(robot)
+          if (robot.bigRobot) {
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y + robot.height
+            )
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y
+            )
+          }
+
+          this.player.score += RobotPoints;
+        }
     }
 
     missileHitsAsteroid(missile, asteroid) {
         this.makeExplosion(asteroid.body.x, asteroid.body.y);
         this.asteroids.remove(asteroid)
         missile.kill()
-
         this.player.score += AsteroidPoints;
     }
 
@@ -306,15 +331,42 @@ export default class extends Phaser.State {
         // Robots are clever enough not to crash into each other.
     }
     playerBulletCollideRobot(bullet, robot) {
-        this.makeExplosion(robot.body.x, robot.body.y);
-        this.robots.remove(robot);
-        this.player.score += RobotPoints;
+        robot.health -= 5
+        bullet.kill()
+        if (robot.health < 0) {
+          this.makeExplosion(robot.body.x, robot.body.y);
+          this.robots.remove(robot);
+          if (robot.bigRobot) {
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y + robot.height
+            )
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y
+            )
+          }
+
+
+          this.player.score += RobotPoints;
+      }
     }
     asteroidCollideRobot(asteroid, robot) {
         this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
             (asteroid.body.y + robot.body.y) / 2);
-        this.asteroids.remove(asteroid);
-        this.robots.remove(robot);
+      if (robot.bigRobot) {
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y + robot.height
+        )
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y
+        )
+      }
+
+      this.asteroids.remove(asteroid);
+      robot.health -= 100;
     }
 
     asteroidCollideOther (asteroid, asteroid2) {
@@ -510,6 +562,19 @@ export default class extends Phaser.State {
 		localStorage.setItem("killerRobotsHighScore", this.HighScore);
 		this.gameOverText.text = message
 		game.time.events.add(4000, this.restartGame, this);
+        const playerName = prompt("Enter your name for sending your score to " + API_URL)
+        if (playerName) {
+          fetch(API_URL + '/submit_score', {
+            // headers: {
+            //   'Content-Type': 'application/json'
+            // },
+            method: "POST",
+            body: JSON.stringify({
+              player: playerName,
+              points: this.player.score
+            })
+          })
+        }
 	}
 
     restartGame() {
@@ -595,9 +660,12 @@ export default class extends Phaser.State {
 
                 var robotRandom = Math.random();
                 if (robotRandom < chanceOfRobot) {
+
+                    var assetName = (robotRandom < chanceOfRobot/10 ? 'big-robot' : 'robot');
+                  //var assetName = 'big-robot'
                     //console.log("Made a robot");
                     var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
-                    var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
+                    var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: assetName});
 
                     this.robots.add(newRobot);
                 }
