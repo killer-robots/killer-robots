@@ -9,6 +9,8 @@ import Sun from '../sprites/Sun'
 import Flag from '../sprites/Flag'
 import Arrow from '../sprites/Arrow'
 
+const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
+
 const FlagPoints = 250;
 const RobotPoints = 50;
 const CoinPoints = 50;
@@ -560,6 +562,19 @@ export default class extends Phaser.State {
 		localStorage.setItem("killerRobotsHighScore", this.HighScore);
 		this.gameOverText.text = message
 		game.time.events.add(4000, this.restartGame, this);
+        const playerName = prompt("Enter your name for sending your score to " + API_URL)
+        if (playerName) {
+          fetch(API_URL + '/submit_score', {
+            // headers: {
+            //   'Content-Type': 'application/json'
+            // },
+            method: "POST",
+            body: JSON.stringify({
+              player: playerName,
+              points: this.player.score
+            })
+          })
+        }
 	}
 
     restartGame() {
