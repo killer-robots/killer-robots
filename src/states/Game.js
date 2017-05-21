@@ -285,13 +285,18 @@ export default class extends Phaser.State {
     }
 
     missileHitsRobot(missile, robot) {
+        this.makeExplosion(robot.body.x, robot.body.y);
         this.robots.remove(robot)
         missile.kill()
+        this.player.score += RobotPoints;
     }
 
     missileHitsAsteroid(missile, asteroid) {
+        this.makeExplosion(asteroid.body.x, asteroid.body.y);
         this.asteroids.remove(asteroid)
         missile.kill()
+
+        this.player.score += AsteroidPoints;
     }
 
     robotCollideRobot(robot1, robot2) {
