@@ -6,9 +6,11 @@ export default class extends Phaser.Sprite {
     this.anchor.setTo(0.5)
     this.scale.setTo(0.8)
     game.physics.enable(this, Phaser.Physics.ARCADE)
-    this.gravity = 10
-    this.gravityRadius = 20000
-    this.eventHorizonRadius = 10000
+
+      this.gravity = 7
+      this.gravityRadius = 100000
+      this.eventHorizonRadius = 13000
+
   }
 
   update () {
@@ -23,8 +25,8 @@ export default class extends Phaser.Sprite {
       object.body.gravity.add(distance.x * this.gravity, distance.y * this.gravity)
       if (distMagSq < this.eventHorizonRadius) {
         //console.log("Object past event horizon");
-        object.body.velocity = new Phaser.Point(0,0);
-        object.health = 0;
+       // object.body.velocity = new Phaser.Point(0,0);
+        object.health -= 3;
       }
     }
   }
