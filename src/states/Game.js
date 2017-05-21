@@ -7,6 +7,7 @@ import BlackHole from '../sprites/BlackHole'
 import Coin from '../sprites/Coin'
 import Sun from '../sprites/Sun'
 import Flag from '../sprites/Flag'
+import Arrow from '../sprites/Arrow'
 
 export default class extends Phaser.State {
   init () {}
@@ -52,7 +53,10 @@ export default class extends Phaser.State {
 
     //Starting flag
     var sun = this.game.suns[0];
-    this.addFlag(sun);
+    var flag = this.addFlag(sun);
+
+    //Arrow to flag
+    this.addArrow(flag);
 
     //Add HUD info
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
@@ -153,9 +157,9 @@ export default class extends Phaser.State {
     if (flag.nearObject == sun)
     {
       var blackHole = this.game.blackHoles[0];
-      this.addFlag(blackHole);
+      this.arrow.towards = this.addFlag(blackHole);
     } else {
-      this.addFlag(sun);
+      this.arrow.towards = this.addFlag(sun);
     }
     this.flags.remove(flag);
   }
@@ -295,6 +299,7 @@ export default class extends Phaser.State {
     sun.play('sun', 7, true, false);
 
     console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
+
   }
 
   addFlag(nearObject) {
@@ -316,6 +321,23 @@ export default class extends Phaser.State {
 
     newFlag.animations.add('flag');
     newFlag.play('flag', 15, true, false);
+    return newFlag;
+  }
+
+  addArrow(towardObject) {
+    console.log('creating arrow!')
+    var newArrow = new Arrow({
+      game: this.game,
+      x: this.player.x,
+      y: this.player.y,
+      asset: 'arrow'
+    });
+
+    newArrow.towards = towardObject;
+    newArrow.animations.add('arrow');
+    newArrow.play('arrow', 15, true, false);
+    this.game.add.existing(newArrow);
+    this.arrow = newArrow;
   }
 
   drawBar(x, y, percentage) {

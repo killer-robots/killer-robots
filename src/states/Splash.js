@@ -22,11 +22,12 @@ export default class extends Phaser.State {
     game.load.spritesheet('kaboom', 'assets/images/explode.png', 128, 128);
     game.load.spritesheet('sun', 'assets/images/sun.png', 426, 426);
     game.load.spritesheet('flag', 'assets/images/flag.png', 278, 202);
+    game.load.spritesheet('arrow', 'assets/images/arrow.png', 160, 160);
 
     this.load.image('bullet', 'assets/images/bullet.png')
     this.load.image('green-bullet', 'assets/images/green-bullet.png')
-      this.load.image('fuel','assets/images/gas.png' )
-      this.load.image('medpack','assets/images/medpack.png' )
+    this.load.image('fuel','assets/images/gas.png' )
+    this.load.image('medpack','assets/images/medpack.png' )
 
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
