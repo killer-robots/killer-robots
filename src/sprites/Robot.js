@@ -9,6 +9,7 @@ export default class extends Phaser.Sprite {
     super(game, x, y, asset)
     game.physics.enable(this, Phaser.Physics.ARCADE)
 
+      this.health = 100
     var baseSpeed = 100
     var speedX = 0
     var speedY = 0

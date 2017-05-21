@@ -288,17 +288,19 @@ export default class extends Phaser.State {
     }
 
     missileHitsRobot(missile, robot) {
-        this.makeExplosion(robot.body.x, robot.body.y);
-        this.robots.remove(robot)
+      robot.health -= 100
         missile.kill()
-        this.player.score += RobotPoints;
+        if (robot.health < 0) {
+            this.makeExplosion(robot.body.x, robot.body.y);
+            this.robots.remove(robot)
+            this.player.score += RobotPoints;
+        }
     }
 
     missileHitsAsteroid(missile, asteroid) {
         this.makeExplosion(asteroid.body.x, asteroid.body.y);
         this.asteroids.remove(asteroid)
         missile.kill()
-
         this.player.score += AsteroidPoints;
     }
 
@@ -306,9 +308,13 @@ export default class extends Phaser.State {
         // Robots are clever enough not to crash into each other.
     }
     playerBulletCollideRobot(bullet, robot) {
-        this.makeExplosion(robot.body.x, robot.body.y);
-        this.robots.remove(robot);
-        this.player.score += RobotPoints;
+        robot.health -= 5
+        bullet.kill()
+        if (robot.health < 0) {
+          this.makeExplosion(robot.body.x, robot.body.y);
+          this.robots.remove(robot);
+          this.player.score += RobotPoints;
+    }
     }
     asteroidCollideRobot(asteroid, robot) {
         this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
