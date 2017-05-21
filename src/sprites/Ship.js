@@ -70,6 +70,7 @@ export default class extends Phaser.Sprite {
     }
   }
 
+
   fuelTankIsEmpty () {
     return this.fuel == 0
   }

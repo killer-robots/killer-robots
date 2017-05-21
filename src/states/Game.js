@@ -111,6 +111,9 @@ export default class extends Phaser.State {
     this.barGraphics = game.add.graphics(0, 0)
     this.barGraphics.fixedToCamera = true
 
+    //Setup player rocket boosters
+    this.createRocketEmitters();
+
     // Audio
     this.laser1 = game.add.audio('laser1');
     this.laser2 = game.add.audio('laser2');
@@ -171,6 +174,8 @@ export default class extends Phaser.State {
     {
       localStorage.setItem("killerRobotsHighScore", this.HighScore);
       this.restartGame()
+    } else {
+      this.updateRockets();
     }
   }
 
@@ -506,5 +511,52 @@ export default class extends Phaser.State {
     explosion.play('kaboom', 30, false, true);
 
     this.explosion1.play();
+  }
+
+
+  updateRockets() {
+    var acc = this.player.body.acceleration.getMagnitude();
+
+    if (acc > 0) {
+      this.leftRocket.setAlpha(1, 0, 300);
+      this.rightRocket.setAlpha(1, 0, 300);
+    }
+    else {
+      this.leftRocket.setAlpha(0, 0, 300);
+      this.rightRocket.setAlpha(0, 0, 300);
+    }
+
+    this.leftRocket.x = this.player.x;
+    this.leftRocket.y = this.player.y;
+
+    this.rightRocket.x = this.player.x;
+    this.rightRocket.y = this.player.y;
+
+    //this.leftRocket.rotation = this.player.rotation;
+  }
+
+  createRocketEmitters() {
+    var emitter = this.game.add.emitter(0, 0, 800);
+
+    emitter.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
+    //emitter.particleAnchor = new Phaser.Point(0.1,0.9);
+    emitter.setAlpha(1, 0, 30);
+    emitter.setScale(0.1, 0, 0.1, 0, 300);
+    emitter.start(false, 200, 1);
+
+    //this.player.addChild(emitter);
+    this.leftRocket = emitter;
+
+    var emitter2 = this.game.add.emitter(0, 0, 800);
+
+    emitter2.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
+    //emitter2.particleAnchor = new Phaser.Point(0.9,0.9);
+    emitter2.setAlpha(1, 0, 30);
+    emitter2.setScale(0.1, 0, 0.1, 0, 300);
+
+    //this.player.addChild(emitter2);
+    emitter2.start(false, 200, 1);
+
+    this.rightRocket = emitter2;
   }
 }
