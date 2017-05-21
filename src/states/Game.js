@@ -12,8 +12,8 @@ import Arrow from '../sprites/Arrow'
 const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
 
 const FlagPoints = 500;
-const RobotPoints = 5;
-const CoinPoints = 50;
+const RobotPoints = 10;
+const CoinPoints = 100;
 const AsteroidPoints = 25;
 const HealthPoints = 25;
 const FuelPoints = 25;
@@ -273,22 +273,7 @@ export default class extends Phaser.State {
     }
 
     playerCollideRobot(player, robot) {
-        this.checkIfPlayerStillAlive();
-
-        this.makeExplosion(
-            (player.body.x + robot.body.x) / 2,
-            (player.body.y + robot.body.y) / 2
-        );
-      if (robot.bigRobot) {
-        this.makeExplosion(
-          robot.body.centerX,
-          robot.body.Y + robot.height
-        )
-        this.makeExplosion(
-          robot.body.centerX,
-          robot.body.Y
-        )
-      }
+      this.checkIfPlayerStillAlive();
 
       this.player.health -= 1;
       robot.health -= 1;
@@ -303,22 +288,6 @@ export default class extends Phaser.State {
       this.player.score += 100
       robot.health -= 100
         missile.kill()
-        if (robot.health < 0) {
-            this.makeExplosion(robot.body.x, robot.body.y);
-            this.robots.remove(robot)
-          if (robot.bigRobot) {
-            this.makeExplosion(
-              robot.body.centerX,
-              robot.body.Y + robot.height
-            )
-            this.makeExplosion(
-              robot.body.centerX,
-              robot.body.Y
-            )
-          }
-
-          this.player.score += RobotPoints;
-        }
     }
 
     missileHitsAsteroid(missile, asteroid) {
@@ -335,38 +304,8 @@ export default class extends Phaser.State {
         this.player.score += RobotPoints;
         robot.health -= 5
         bullet.kill()
-        if (robot.health < 0) {
-          this.makeExplosion(robot.body.x, robot.body.y);
-          this.robots.remove(robot);
-          if (robot.bigRobot) {
-            this.makeExplosion(
-              robot.body.centerX,
-              robot.body.Y + robot.height
-            )
-            this.makeExplosion(
-              robot.body.centerX,
-              robot.body.Y
-            )
-          }
-
-
-
-      }
     }
     asteroidCollideRobot(asteroid, robot) {
-        this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
-            (asteroid.body.y + robot.body.y) / 2);
-      if (robot.bigRobot) {
-        this.makeExplosion(
-          robot.body.centerX,
-          robot.body.Y + robot.height
-        )
-        this.makeExplosion(
-          robot.body.centerX,
-          robot.body.Y
-        )
-      }
-
       this.asteroids.remove(asteroid);
       robot.health -= 50;
     }
