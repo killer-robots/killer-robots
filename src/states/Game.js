@@ -122,7 +122,7 @@ export default class extends Phaser.State {
         this.weapon = game.add.weapon(50, 'bullet')
         this.weapon.bulletLifespan = 1000;
         this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-        this.weapon.bulletSpeed = 750;
+        this.weapon.bulletSpeed = 1200;
         this.weapon.fireRate = 100;
         this.weapon.trackSprite(this.player, 0, 0, true);
         this.weapon.actualFire = function(shooter, weapon) {
@@ -140,7 +140,7 @@ export default class extends Phaser.State {
         this.specialWeapon1 = game.add.weapon(50, 'bullet')
         this.specialWeapon1.bulletLifespan = 1000;
         this.specialWeapon1.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-        this.specialWeapon1.bulletSpeed = 750;
+        this.specialWeapon1.bulletSpeed = 1200;
         this.specialWeapon1.fireRate = 100;
         this.specialWeapon1.trackSprite(this.player, 0, 0, true);
         this.specialWeapon1.actualFire = function(shooter, weapon) {
@@ -210,7 +210,7 @@ export default class extends Phaser.State {
         this.addWeapons();
 
         //Check for firing input
-        if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && this.player.health > 0) {
             this.player.currentWeapon.actualFire(this.player, this.player.currentWeapon);
         }
 
