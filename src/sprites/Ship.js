@@ -2,7 +2,6 @@ import Phaser from 'phaser'
 import Bullet from '../sprites/Bullet'
 
 const movementSpeed = 500
-const maxHealth = 100
 
 export default class extends Phaser.Sprite {
   constructor ({ game, x, y, asset }) {
@@ -15,12 +14,31 @@ export default class extends Phaser.Sprite {
     this.body.maxVelocity.set(movementSpeed)
     this.fuel = this.fuelMax = 1000000
     this.firerate = 10
-    this.health = maxHealth
+    this.health = this.maxHealth = 100
     this.score = 0
     this.body.mass = 3
+      this.maxFireRate = 300
+      this.fireRate = 300
   }
 
   update () {
+      this.fireRate -= 1
+      if (this.firerate < 0) {
+        if (game.input.keyboard.isDown(Phaser.Keyboard.X)) {
+          this.game.missile1.play();
+          var missile = new Bullet({
+              game: this.game,
+              x: this.body.center.x,
+              y: this.body.center.y,
+              asset: 'missile',
+              rotation: this.rotation
+          })
+          this.game.MissileGroup.add(missile)
+          this.firerate = this.maxFireRate;
+      }
+  }
+
+
     if (this.fuelTankIsEmpty()) {
       this.body.acceleration.set(0)
     } else if (game.cursors.up.isDown) {

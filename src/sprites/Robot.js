@@ -73,7 +73,7 @@ export default class extends Phaser.Sprite {
               asset: 'green-bullet',
               rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
             })
-            this.game.add.existing(newBullet)
+            this.game.robotWeaponGroup.add(newBullet)
             this.firerate = firerateMax;
           }
         }

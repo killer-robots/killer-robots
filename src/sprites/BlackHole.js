@@ -28,6 +28,7 @@ export default class extends Phaser.Sprite {
           game.add.tween(object).to({alpha: 0}, 50, Phaser.Easing.Linear.None, true, 0, 0, false)
           object.x = this.x;
           object.y = this.y;
+
           object.body.velocity = new Phaser.Point(0, 0);
         }
       }
