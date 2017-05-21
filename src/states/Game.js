@@ -91,6 +91,7 @@ export default class extends Phaser.State {
 	//high score text
     this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
+
     scoreTextImage.tint = 0xFFD700
     scoreTextImage.fixedToCamera = true
 	
@@ -100,11 +101,16 @@ export default class extends Phaser.State {
     gameOverTextImage.tint = 0xD80000
     gameOverTextImage.fixedToCamera = true
 	
+
+    highScoreTextImage.tint = 0xFF9905
+    highScoreTextImage.fixedToCamera = true
+
+
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
-    this.weapon.bulletLifespan = 500;
+    this.weapon.bulletLifespan = 1000;
     this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-    this.weapon.bulletSpeed = 700;
+    this.weapon.bulletSpeed = 750;
     this.weapon.fireRate = 100;
     this.weapon.trackSprite(this.player, 0, 0, true);
     var shootSignal = new Phaser.Signal();
@@ -162,7 +168,7 @@ export default class extends Phaser.State {
     game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
 
     //Bullets
-    console.log("Bullets:" + this.weapon.bullets.total);
+    //console.log("Bullets:" + this.weapon.bullets.total);
     game.physics.arcade.collide(this.weapon.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
     game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
 
@@ -175,6 +181,12 @@ export default class extends Phaser.State {
 
     //player flag collision
     game.physics.arcade.collide(this.player, this.flags, this.playerCollideFlag, null, this);
+
+    if (this.player === null || this.player.health == 0)
+    {
+      localStorage.setItem("killerRobotsHighScore", this.HighScore);
+      this.restartGame()
+    }
   }
 
   playerCollideFlag(player, flag) {
@@ -204,12 +216,7 @@ export default class extends Phaser.State {
     this.robots.remove(robot);
   }
   robotCollideRobot(robot1, robot2) {
-    this.makeExplosion(
-      (robot1.body.x + robot2.body.x) / 2,
-      (robot1.body.y + robot2.body.y) / 2
-    );
-    this.robots.remove(robot1);
-    this.robots.remove(robot2);
+    // Robots are clever enough not to crash into each other.
   }
   playerBulletCollideRobot(bullet, robot) {
     this.makeExplosion(robot.body.x, robot.body.y);
@@ -422,6 +429,10 @@ export default class extends Phaser.State {
     }
   }
 
+  restartGame() {
+    this.game.state.start("Game");
+  }
+
   addCoin() {
     if (this.CoinGroup.total < 25) {
       var chanceOfCoin = 0.05;
@@ -434,7 +445,6 @@ export default class extends Phaser.State {
         newCoin.width = 32;
         newCoin.height = 32;
         newCoin.animations.add('coin');
-        newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
         newCoin.play('coin', 10, true, false);
       }
     }
@@ -470,6 +480,7 @@ export default class extends Phaser.State {
 
       var asteroidRandom = Math.random();
       if (asteroidRandom < chanceOfAsteroid) {
+        console.log("Made an asteroid");
         var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
         var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
         this.asteroids.add(newAsteroid);
@@ -479,11 +490,14 @@ export default class extends Phaser.State {
 
 
   addRobot() {
-    if (this.robots.total < 5) {
+    var maxRobots = this.player.score / 10;
+
+    if (this.robots.total < maxRobots) {
       var chanceOfRobot = 0.1;
 
       var robotRandom = Math.random();
       if (robotRandom < chanceOfRobot) {
+        console.log("Made a robot");
         var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
         var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
         this.robots.add(newRobot);
@@ -514,6 +528,7 @@ export default class extends Phaser.State {
   }
 
   makeExplosion(x, y) {
+    console.log("Making explosion!");
     var explosion = game.add.sprite(x, y, 'kaboom');
     explosion.anchor.x = 0.5;
     explosion.anchor.y = 0.5;
