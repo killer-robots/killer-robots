@@ -332,6 +332,7 @@ export default class extends Phaser.State {
         // Robots are clever enough not to crash into each other.
     }
     playerBulletCollideRobot(bullet, robot) {
+        this.player.score += RobotPoints;
         robot.health -= 5
         bullet.kill()
         if (robot.health < 0) {
@@ -349,7 +350,7 @@ export default class extends Phaser.State {
           }
 
 
-          this.player.score += RobotPoints;
+
       }
     }
     asteroidCollideRobot(asteroid, robot) {
