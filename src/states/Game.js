@@ -188,7 +188,7 @@ export default class extends Phaser.State {
         this.spaceWind = game.add.audio('spaceWind', 0.5, true);
         this.musics = [game.add.audio('mars', 0.5), game.add.audio('mercury', 0.5),
                        game.add.audio('venus', 0.5), game.add.audio('map', 0.5)];
-        this.currentSongIndex = 0;
+        this.currentSongIndex = game.rnd.integerInRange(0, this.musics.length - 1);
         this.musics[this.currentSongIndex].play();
     }
 
