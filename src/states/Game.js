@@ -169,11 +169,13 @@ export default class extends Phaser.State {
         this.FuelGroup = this.game.add.physicsGroup();
         this.MedpackGroup = this.game.add.physicsGroup();
         this.WeaponGroup = this.game.add.physicsGroup();
+        this.MissileGroup = this.game.add.physicsGroup();
 
         this.barGraphics = game.add.graphics(0, 0)
         this.barGraphics.fixedToCamera = true
 
         // Audio
+        this.missile1 = game.add.audio('missile1')
         this.laser1 = game.add.audio('laser1');
         this.laser2 = game.add.audio('laser2');
         this.explosion1 = game.add.audio('explosion1');
