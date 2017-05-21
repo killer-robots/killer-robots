@@ -21,9 +21,16 @@ export default class extends Phaser.Sprite {
   }
 
   update () {
+    // a = targetA - sourceA
+    // a += (a>180) ? -360 : (a<-180) ? 360 : 0
+    var a = game.physics.arcade.angleToPointer(this, game.input.activePointer) - this.rotation
+     a += (a>Math.PI) ? -Math.PI*2 : (a<-Math.PI) ? Math.PI*2 : 0
+    var dist = game.physics.arcade.distanceToPointer(this)
+
     if (this.fuelTankIsEmpty()) {
       this.body.acceleration.set(0)
-    } else if (game.cursors.up.isDown) {
+    } else if (game.cursors.up.isDown || (dist > 50 && a < 0.5 && a > -0.5))
+      {
       game.physics.arcade.accelerationFromRotation(this.rotation, movementSpeed, this.body.acceleration)
     } else if (game.cursors.down.isDown) {
       game.physics.arcade.accelerationFromRotation(this.rotation, -movementSpeed, this.body.acceleration)
@@ -37,14 +44,14 @@ export default class extends Phaser.Sprite {
       this.game.spaceWind.play()
     }
 
-    if (game.cursors.left.isDown) {
+    if (game.cursors.left.isDown || ( a <= -0.15)) {
       this.body.angularVelocity = -250
-    } else if (game.cursors.right.isDown) {
+    } else if (game.cursors.right.isDown || ( a >= 0.15)) {
       this.body.angularVelocity = 250
     } else {
       this.body.angularVelocity = 0
     }
-
+    //this.rotation = game.physics.arcade.moveToPointer(this, 60, game.input.activePointer, 500);
     this.fuel = Math.max(0, this.fuel - this.body.acceleration.getMagnitudeSq() / 500)
       this.firerate -= 1
 
