@@ -41,6 +41,7 @@ export default class extends Phaser.State {
             y: this.world.centerY,
             asset: 'ship'
         })
+
         this.player.body.collideWorldBounds = true;
         game.camera.follow(this.player);
 
@@ -54,7 +55,6 @@ export default class extends Phaser.State {
         this.flags = game.add.physicsGroup();
         this.addSun()
         this.game.add.existing(this.player);
-
         //Starting flag
         var sun = this.game.suns[0];
         var flag = this.addFlag(sun);
@@ -422,20 +422,14 @@ export default class extends Phaser.State {
         }
         this.highScoreText.text = 'high ' + this.HighScore;
         this.scoreText.text = 'score ' + this.player.score
-        if (this.player === null || this.player.health == 0 || this.player.alpha == 0)
-        {
-            localStorage.setItem("killerRobotsHighScore", this.HighScore);
-            this.gameOverText.text = 'You died!\nGame Over'
-            game.time.events.add(4000, this.restartGame, this);
-        }
-        if (this.player.fuel == 0)
-        {
-            localStorage.setItem("killerRobotsHighScore", this.HighScore);
-            this.gameOverText.text = 'You are out of fuel!'
-            game.time.events.add(4000, this.restartGame, this);
-
-        }
     }
+	
+	notifyPlayerDied(message) {
+		console.log("Player died")
+		localStorage.setItem("killerRobotsHighScore", this.HighScore);
+		this.gameOverText.text = message
+		game.time.events.add(4000, this.restartGame, this);
+	}
 
     restartGame() {
         this.game.state.start("Game");

@@ -18,6 +18,7 @@ export default class extends Phaser.Sprite {
     this.health = maxHealth
     this.score = 0
     this.body.mass = 3
+	this.alpha = 1
   }
 
   update () {
@@ -50,7 +51,7 @@ export default class extends Phaser.Sprite {
 
     this.body.gravity.set(0, 0) // Reset and recalculate below.
     for (let blackHole of game.blackHoles) {
-      blackHole.applyGravityTo(this)
+      blackHole.applyGravityTo(this);
     }
     for (let sun of game.suns) {
       sun.applyGravityTo(this)
@@ -59,15 +60,24 @@ export default class extends Phaser.Sprite {
       planet.applyGravityTo(this)
     }
 
-    if (this.health <= 0)
+    if (this.alpha < 1 )
     {
-      this.game.makeExplosion(this.x, this.y);
-    }
-    if (this.alpha == 0 || this.health <= 0 )
-    {
-      this.destroy();
-      console.log("asteroid destroyed!\nAlpha: " +this.alpha + "\nHealth: " +this.health);
-    }
+		this.game.notifyPlayerDied('You died! Game Over')
+		this.destroy();
+    } else {
+		console.log("alpha: " + this.alpha)
+	}
+	if (this.health <= 0)
+	{
+		this.game.makeExplosion(this.x, this.y);
+		this.game.notifyPlayerDied('You died! Game Over')
+		this.destroy();
+	}
+	if (this.fuel <= 0 ) {
+		this.game.makeExplosion(this.x, this.y);
+		this.game.notifyPlayerDied('You are out of fuel!');
+		this.destroy();
+	}
   }
 
   fuelTankIsEmpty () {
