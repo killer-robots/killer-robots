@@ -415,7 +415,6 @@ export default class extends Phaser.State {
         newCoin.width = 32;
         newCoin.height = 32;
         newCoin.animations.add('coin');
-        newCoin.body.setCircle(10, 5, 5);//(radius,xoffset,yoffset);
         newCoin.play('coin', 10, true, false);
       }
     }
