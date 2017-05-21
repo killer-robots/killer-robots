@@ -39,13 +39,29 @@ export default class extends Phaser.Sprite {
     this.anchor.y = 0.5;
     this.angle = randomAngle;
     this.outOfBoundsKill = true;
+
+    this.health = 100;
+    this.alpha = 1;
+
+    this.body.mass = 5
   }
 
   update () {
-
+    for (let blackHole of game.blackHoles) {
+      blackHole.applyGravityTo(this)
+    }
+    for (let sun of game.suns) {
+      sun.applyGravityTo(this)
+    }
+    if (this.health <= 0)
+    {
+      this.game.makeExplosion(this.x, this.y);
+    }
+    if (this.alpha == 0 || this.health <= 0 )
+    {
+      this.destroy();
+      console.log("asteroid destroyed!\nAlpha: " +this.alpha + "\nHealth: " +this.health);
+    }
   }
 
-  explode () {
-
-  }
 }

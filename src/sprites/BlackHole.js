@@ -8,6 +8,8 @@ export default class extends Phaser.Sprite {
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.gravity = 10
     this.gravityRadius = 50000
+    this.eventHorizonRadius = 10000
+
   }
 
   update () {
@@ -15,10 +17,23 @@ export default class extends Phaser.Sprite {
   }
 
   applyGravityTo(object) {
-    var distance = new Phaser.Point(this.body.center.x - object.body.center.x, this.body.center.y - object.body.center.y)
-    if (distance.getMagnitudeSq() < this.gravityRadius) {
-      // The object is close enough to be affected by this planet's gravity.
-      object.body.gravity.add(distance.x * this.gravity, distance.y * this.gravity)
+    if (object !== null && object.body !== null) {
+      var distance = new Phaser.Point(this.body.center.x - object.body.center.x, this.body.center.y - object.body.center.y)
+      var distMagSq = distance.getMagnitudeSq()
+      if (distMagSq < this.gravityRadius) {
+        // The object is close enough to be affected by this planet's gravity.
+        object.body.gravity.add(distance.x * this.gravity, distance.y * this.gravity)
+
+        if (distMagSq < this.eventHorizonRadius) {
+          //console.log("Object past event horizon");
+		  
+          game.add.tween(object).to({alpha: 0}, 50, Phaser.Easing.Linear.None, true, 0, 0, false)
+          object.x = this.x;
+          object.y = this.y;
+		  
+          object.body.velocity = new Phaser.Point(0, 0);
+        }
+      }
     }
   }
 }

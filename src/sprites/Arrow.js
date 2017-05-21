@@ -61,7 +61,7 @@ export default class extends Phaser.Sprite {
       this.y = Phaser.Math.clamp(this.y, arrowBounds.y, arrowBounds.y + arrowBounds.height);
     }
 
-    console.log("arrow visible: " + this.visible + ".\narrow x: " + this.x + ". arrow y: " + this.y)
+    //console.log("arrow visible: " + this.visible + ".\narrow x: " + this.x + ". arrow y: " + this.y)
   }
 
 
