@@ -1,5 +1,4 @@
 node_modules/
-dist/
 .vscode/
 nbproject/
 .DS_Store
