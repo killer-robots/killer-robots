@@ -9,7 +9,7 @@ export default class extends Phaser.Sprite {
 
     this.anchor.setTo(0.2, 0.5);
     this.body.allowRotation = false;
-    this.scale.setTo(0.3)
+    this.scale.setTo(0.2)
     this.speed = 800;
 
   }
