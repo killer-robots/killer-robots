@@ -116,26 +116,59 @@ export default class extends Phaser.State {
         highScoreTextImage.tint = 0xFF9905
         highScoreTextImage.fixedToCamera = true
 
-
-        // Set up a weapon
+        // Set up the default weapon
         this.weapon = game.add.weapon(50, 'bullet')
         this.weapon.bulletLifespan = 1000;
         this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-
-            this.weapon.bulletSpeed = 1200
+        this.weapon.bulletSpeed = 750;
         this.weapon.fireRate = 100;
         this.weapon.trackSprite(this.player, 0, 0, true);
+        this.weapon.actualFire = function(shooter, weapon) {
+          weapon.fire(shooter);
+        };
         var shootSignal = new Phaser.Signal();
         shootSignal.add(function() {
-            this.laser1.play();
+          this.laser1.play();
         }, this);
         this.weapon.onFire = shootSignal;
+        var defaultWeapon = this.weapon;
+        this.player.currentWeapon = defaultWeapon;
+
+        // Set up the special weapon #1
+        this.specialWeapon1 = game.add.weapon(50, 'bullet')
+        this.specialWeapon1.bulletLifespan = 1000;
+        this.specialWeapon1.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
+        this.specialWeapon1.bulletSpeed = 750;
+        this.specialWeapon1.fireRate = 100;
+        this.specialWeapon1.trackSprite(this.player, 0, 0, true);
+        this.specialWeapon1.actualFire = function(shooter, weapon) {
+          if (weapon.game.time.time < weapon.nextFire) { return; }
+          var c = Math.cos(shooter.angle * (Math.PI / 180));
+          var s = Math.sin(shooter.angle * (Math.PI / 180));
+          var firerateBackup = weapon.fireRate;
+          weapon.fireRate = 0;
+          var spread = 0.2;
+
+          for (var dir = -2; dir <= 2; dir++) {
+            weapon.fire(shooter, shooter.position.x + (c + spread * dir) % (Math.PI * 2),
+                                 shooter.position.y + (s - spread * dir) % (Math.PI * 2));
+          }
+
+          weapon.fireRate = firerateBackup;
+          weapon.nextFire = weapon.game.time.time + weapon.fireRate;
+          weapon.shotsLeft--;
+          if (weapon.shotsLeft <= 0) {
+            shooter.currentWeapon = defaultWeapon; // Set default weapon back.
+          }
+        };
+        this.specialWeapon1.onFire = shootSignal;
 
         this.robotWeaponGroup = this.game.add.physicsGroup();
 
         this.CoinGroup = this.game.add.physicsGroup();
         this.FuelGroup = this.game.add.physicsGroup();
         this.MedpackGroup = this.game.add.physicsGroup();
+        this.WeaponGroup = this.game.add.physicsGroup();
 
         this.barGraphics = game.add.graphics(0, 0)
         this.barGraphics.fixedToCamera = true
@@ -153,7 +186,6 @@ export default class extends Phaser.State {
 
     }
 
-
     update() {
         //Add objects
         this.addAsteroid();
@@ -161,10 +193,11 @@ export default class extends Phaser.State {
         this.addCoin();
         this.addFuel();
         this.addMedpack();
+        this.addWeapons();
 
         //Check for firing input
         if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-            this.weapon.fire();
+            this.player.currentWeapon.actualFire(this.player, this.player.currentWeapon);
         }
 
         //Coin collection
@@ -176,6 +209,11 @@ export default class extends Phaser.State {
         //Health collision
         game.physics.arcade.overlap(this.player, this.MedpackGroup, this.playerCollideMedpack, null, this);
 
+        //Weapons collision
+        game.physics.arcade.overlap(this.player, this.WeaponGroup, this.playerCollideWeapon, null, this);
+        // This doesn't probably work yet:
+        // game.physics.arcade.overlap(this.robots, this.WeaponGroup, this.playerCollideWeapon, null, this);
+
         //Player collisions
         game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
         game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
@@ -184,6 +222,8 @@ export default class extends Phaser.State {
         //console.log("Bullets:" + this.weapon.bullets.total);
         game.physics.arcade.collide(this.weapon.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
         game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
+        game.physics.arcade.collide(this.specialWeapon1.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
+        game.physics.arcade.collide(this.specialWeapon1.bullets, this.robots, this.playerBulletCollideRobot, null, this);
 
         //Self-collisions
         game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  null, this);
@@ -197,8 +237,6 @@ export default class extends Phaser.State {
 
             //robots shoot
             game.physics.arcade.collide(this.robotWeaponGroup, this.player, this.robotBulletCollidePlayerHandler, null, this);
-
-
     }
 
     playerCollideFlag(player, flag) {
@@ -290,6 +328,12 @@ export default class extends Phaser.State {
         medpack.kill();
         this.player.score += HealthPoints;
     }
+    playerCollideWeapon (player, weaponCrate) {
+        this.powerupSound.play();
+        weaponCrate.kill();
+        this.player.currentWeapon = this.specialWeapon1;
+        this.specialWeapon1.shotsLeft = 100;
+    }
 
     checkIfPlayerStillAlive() {
         if (this.player.health <= 0) {
@@ -356,7 +400,6 @@ export default class extends Phaser.State {
         sun.play('sun', 7, true, false);
 
         console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
-
     }
 
     addFlag(nearObject) {
@@ -487,6 +530,18 @@ export default class extends Phaser.State {
                 var xPos = this.world.width * Math.random();
                 var yPos = this.world.width * Math.random();
                 var newMedpack = this.MedpackGroup.create(xPos, yPos, 'medpack');
+            }
+        }
+    }
+
+    addWeapons() {
+        if (this.WeaponGroup.total < 5) {
+            var chanceOfFuel = .1;
+            var fuelRandom = Math.random();
+            if (fuelRandom < chanceOfFuel) {
+                var xPos = this.world.width * Math.random();
+                var yPos = this.world.width * Math.random();
+                var newFuel = this.WeaponGroup.create(xPos, yPos, 'weapon1');
             }
         }
     }
