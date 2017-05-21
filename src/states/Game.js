@@ -182,11 +182,7 @@ export default class extends Phaser.State {
     //player flag collision
     game.physics.arcade.collide(this.player, this.flags, this.playerCollideFlag, null, this);
 
-    if (this.player === null || this.player.health == 0)
-    {
-      localStorage.setItem("killerRobotsHighScore", this.HighScore);
-      this.restartGame()
-    }
+    //moved the restart game block from here to render
   }
 
   playerCollideFlag(player, flag) {
@@ -413,19 +409,18 @@ export default class extends Phaser.State {
     }
     this.highScoreText.text = 'high ' + this.HighScore;
 	this.scoreText.text = 'score ' + this.player.score
-	if (this.player.health == 0) {
-      //TODO:  End game
-	  console.log(this.player.x)
-	console.log(this.player.y)
-	  console.log('game over health 0')
+	if (this.player === null || this.player.health == 0)
+    {
+      localStorage.setItem("killerRobotsHighScore", this.HighScore);
 	  this.gameOverText.text = 'You died!\nGame Over'
+      game.time.events.add(5000, this.restartGame, this);
     }
-	if (this.player.fuel == 0) {
-      //TODO:  End game
-	  console.log('game over fuel 0')
-	  console.log(this.player.x)
-		console.log(this.player.y)
+	if (this.player.fuel == 0)
+    {
+      localStorage.setItem("killerRobotsHighScore", this.HighScore);
 	  this.gameOverText.text = 'You are out of fuel!'
+	  game.time.events.add(5000, this.restartGame, this);
+      
     }
   }
 
