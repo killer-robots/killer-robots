@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import Bullet from './Bullet'
 
 const firerateMax = 100
+const movementSpeed = 100
 
 export default class extends Phaser.Sprite {
   constructor ({ game, x, y, asset }) {
@@ -59,23 +60,30 @@ export default class extends Phaser.Sprite {
     }
     else {
       try {
-        if (this.playerIsNearby()) {
-          // Move towards the player.
-          this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
+        var playerIsNearby = this.playerIsNearby();
+        this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
+        this.body.velocity.normalize();
 
-          // Try to shoot the player.
-          if (this.firerate < 0) {
-            this.game.laser2.play();
-            var newBullet = new Bullet({
-              game: this.game,
-              x: this.body.center.x,
-              y: this.body.center.y,
-              asset: 'green-bullet',
-              rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
-            })
-            this.game.robotWeaponGroup.add(newBullet)
-            this.firerate = firerateMax;
-          }
+        if (playerIsNearby) {
+          // Move slowly towards the player to make space for other robots.
+          this.body.velocity.multiply(movementSpeed * 0.2, movementSpeed * 0.2);
+        } else {
+          // Move towards the player at normal speed.
+          this.body.velocity.multiply(movementSpeed, movementSpeed);
+        }
+
+        // Try to attack the player.
+        if (this.firerate < 0 && playerIsNearby) {
+          this.game.laser2.play();
+          var newBullet = new Bullet({
+            game: this.game,
+            x: this.body.center.x,
+            y: this.body.center.y,
+            asset: 'green-bullet',
+            rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
+          })
+          this.game.robotWeaponGroup.add(newBullet)
+          this.firerate = firerateMax;
         }
 
         this.firerate -= 1
@@ -87,6 +95,6 @@ export default class extends Phaser.Sprite {
   }
 
   playerIsNearby() {
-    return this.game.player.body.center.distance(this.body.center) < 200
+    return this.game.player.body.center.distance(this.body.center) < 250
   }
 }
