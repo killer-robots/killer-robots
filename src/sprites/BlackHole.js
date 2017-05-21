@@ -19,6 +19,16 @@ export default class extends Phaser.Sprite {
     if (distance.getMagnitudeSq() < this.gravityRadius) {
       // The object is close enough to be affected by this planet's gravity.
       object.body.gravity.add(distance.x * this.gravity, distance.y * this.gravity)
+	  //health drops to zero
+	  //console.log('before blackhole')
+	  //console.log(object.health)
+	  object.health = 0
+	  //console.log('after blackhole')
+	  //console.log(object.health)
+	  //ship fades
+	  //console.log('fade in blackhole')
+	  //console.log(object.alpha)
+	  game.add.tween(object).to( { alpha: 0 }, 1000, Phaser.Easing.Linear.None, true, 0, -1, false)
     }
   }
 }
