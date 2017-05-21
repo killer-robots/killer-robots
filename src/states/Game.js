@@ -639,7 +639,7 @@ export default class extends Phaser.State {
         }
 
     updateRockets() {
-      if (this.player != null) {
+      if (this.player != null && this.player.body != null) {
         var acc = this.player.body.acceleration.getMagnitude();
 
         if (acc > 0) {
