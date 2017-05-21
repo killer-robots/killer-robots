@@ -28,13 +28,13 @@ export default class extends Phaser.Sprite {
     this.body.velocity = new Phaser.Point(speedX, speedY)
 
     if (asset == 'robot') {
-      this.health = 50;
+      this.health = 25;
       this.body.mass = 2
       this.body.setCircle(10, 0, 0);
       this.bigRobot = false;
       //console.log("small robot made");
     } else {
-      this.health = 300;
+      this.health = 200;
       this.body.mass = 10
       this.body.setSize(105,169);
       this.bigRobot = true;
@@ -64,11 +64,20 @@ export default class extends Phaser.Sprite {
 
     if (this.health <= 0)
     {
-      this.game.makeExplosion(this.x, this.y);
+      if (this.bigRobot) {
+        this.makeExplosion(
+          this.body.centerX,
+          this.body.Y + robot.height
+        )
+        this.makeExplosion(
+          this.body.centerX,
+          this.body.Y
+        )
+      }
+      this.game.makeExplosion(this.centerX, this.centerY);
     }
-    if (this.alpha == 0 || this.health <= 0 )
+    if (this.alpha < 1|| this.health <= 0 )
     {
-      console.log("asteroid destroyed!\nAlpha: " + this.alpha + "\nHealth: " +this.health);
       this.destroy();
     }
     else {
