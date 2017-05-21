@@ -566,16 +566,10 @@ export default class extends Phaser.State {
 		game.time.events.add(4000, this.restartGame, this);
         const playerName = prompt("Enter your name for sending your score to " + API_URL)
         if (playerName) {
-          fetch(API_URL + '/submit_score', {
-            // headers: {
-            //   'Content-Type': 'application/json'
-            // },
-            method: "POST",
-            body: JSON.stringify({
-              player: playerName,
-              points: this.player.score
+            this.submitScore({
+                player: playerName,
+                points: this.player.score
             })
-          })
         }
 	}
 
@@ -756,4 +750,10 @@ export default class extends Phaser.State {
       this.rightRocket = emitter2;
     }
 
+    submitScore(body) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", API_URL + '/submit_score', true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(body));
+    }
 }
