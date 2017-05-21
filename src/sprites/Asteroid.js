@@ -53,11 +53,11 @@ export default class extends Phaser.Sprite {
     for (let sun of game.suns) {
       sun.applyGravityTo(this)
     }
-    if (this.health == 0)
+    if (this.health <= 0)
     {
       this.game.makeExplosion(this.x, this.y);
     }
-    if (this.alpha == 0 || this.health == 0 )
+    if (this.alpha == 0 || this.health <= 0 )
     {
       this.destroy();
       console.log("asteroid destroyed!\nAlpha: " +this.alpha + "\nHealth: " +this.health);
