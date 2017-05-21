@@ -185,13 +185,19 @@ export default class extends Phaser.State {
         this.coin1 = game.add.audio('coin1');
         this.powerupSound = game.add.audio('powerupSound', 0.5);
         this.spaceWind = game.add.audio('spaceWind', 0.5, true);
-        this.musics = [game.add.audio('mars', 0.5, true)];
-
-        this.musics[0].play();
-
+        this.musics = [game.add.audio('mars', 0.5), game.add.audio('mercury', 0.5),
+                       game.add.audio('venus', 0.5), game.add.audio('map', 0.5)];
+        this.currentSongIndex = 0;
+        this.musics[this.currentSongIndex].play();
     }
 
     update() {
+        if (!this.musics[this.currentSongIndex].isPlaying) {
+          // Play next song.
+          this.currentSongIndex = (this.currentSongIndex + 1) % this.musics.length;
+          this.musics[this.currentSongIndex].play();
+        }
+
         //Add objects
         this.addAsteroid();
         this.addRobot();
