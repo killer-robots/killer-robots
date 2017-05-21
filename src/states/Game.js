@@ -90,20 +90,24 @@ export default class extends Phaser.State {
         //high score text
         this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
         var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
-
-        scoreTextImage.tint = 0xFFD700
-        scoreTextImage.fixedToCamera = true
+        highScoreTextImage.tint = 0xFF9905
+        highScoreTextImage.fixedToCamera = true
 
         // options/pause menu text
-        this.optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-        // this.optionsText.text = 'options'
-        this.optionsText.text = 'pause'
-        var optionsTextImage = game.add.image(5, 362, this.optionsText)
-        optionsTextImage.tint = 0xFFFFFF
-        optionsTextImage.fixedToCamera = true
-        optionsTextImage.inputEnabled = true
-        optionsTextImage.events.onInputDown.add(() => {
+        var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+        this.optionsTextImage = game.add.image(5, 362, optionsText)
+        this.optionsTextImage.texture.text = 'pause'
+        this.optionsTextImage.tint = 0xFFFFFF
+        this.optionsTextImage.fixedToCamera = true
+        this.optionsTextImage.inputEnabled = true
+        this.asdf = undefined
+        this.optionsTextImage.events.onInputDown.add(() => {
           game.paused = !game.paused
+          if (game.paused) {
+            this.optionsTextImage.texture.text = 'unpause'
+          } else {
+            this.optionsTextImage.texture.text = 'pause'
+          }
         })
 
         //game over text
@@ -111,7 +115,6 @@ export default class extends Phaser.State {
         var gameOverTextImage = game.add.image(game.camera.width/8, game.camera.height/2, this.gameOverText)
         gameOverTextImage.tint = 0xD80000
         gameOverTextImage.fixedToCamera = true
-
 
         highScoreTextImage.tint = 0xFF9905
         highScoreTextImage.fixedToCamera = true
