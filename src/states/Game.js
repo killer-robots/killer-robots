@@ -195,12 +195,7 @@ export default class extends Phaser.State {
     this.robots.remove(robot);
   }
   robotCollideRobot(robot1, robot2) {
-    this.makeExplosion(
-      (robot1.body.x + robot2.body.x) / 2,
-      (robot1.body.y + robot2.body.y) / 2
-    );
-    this.robots.remove(robot1);
-    this.robots.remove(robot2);
+    // Robots are clever enough not to crash into each other.
   }
   playerBulletCollideRobot(bullet, robot) {
     this.makeExplosion(robot.body.x, robot.body.y);
@@ -456,7 +451,9 @@ export default class extends Phaser.State {
 
 
   addRobot() {
-    if (this.robots.total < 5) {
+    var maxRobots = this.player.score / 10;
+
+    if (this.robots.total < maxRobots) {
       var chanceOfRobot = 0.1;
 
       var robotRandom = Math.random();
