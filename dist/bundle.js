@@ -4094,7 +4094,7 @@ var _class = function (_Phaser$Sprite) {
 
     _this.anchor.setTo(0.2, 0.5);
     _this.body.allowRotation = false;
-    _this.scale.setTo(0.3);
+    _this.scale.setTo(0.2);
     _this.speed = 800;
 
     return _this;
@@ -4549,7 +4549,6 @@ var _class = function (_Phaser$Sprite) {
 
     game.physics.enable(_this, _phaser2.default.Physics.ARCADE);
 
-    _this.health = 100;
     var baseSpeed = 100;
     var speedX = 0;
     var speedY = 0;
@@ -4568,13 +4567,17 @@ var _class = function (_Phaser$Sprite) {
     _this.body.velocity = new _phaser2.default.Point(speedX, speedY);
 
     if (asset == 'robot') {
+      _this.health = 50;
       _this.body.mass = 2;
       _this.body.setCircle(10, 0, 0);
       _this.bigRobot = false;
+      //console.log("small robot made");
     } else {
+      _this.health = 300;
       _this.body.mass = 10;
       _this.body.setSize(105, 169);
       _this.bigRobot = true;
+      //console.log("big robot made");
     }
 
     _this.anchor.setTo(0.5);
@@ -4582,7 +4585,6 @@ var _class = function (_Phaser$Sprite) {
     _this.body.bounce.set(1);
 
     _this.outOfBoundsKill = true;
-    _this.health = 100;
     _this.alpha = 1;
 
     return _this;
@@ -4984,8 +4986,8 @@ var _class = function (_Phaser$Sprite) {
     _this.scale.setTo(0.8);
     game.physics.enable(_this, _phaser2.default.Physics.ARCADE);
 
-    _this.gravity = 7;
-    _this.gravityRadius = 100000;
+    _this.gravity = 5;
+    _this.gravityRadius = 80000;
     _this.eventHorizonRadius = 13000;
 
     return _this;
@@ -5174,12 +5176,12 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var API_URL = 'https://killer-robots-highscore-server.herokuapp.com';
 
-var FlagPoints = 250;
-var RobotPoints = 50;
+var FlagPoints = 500;
+var RobotPoints = 5;
 var CoinPoints = 50;
 var AsteroidPoints = 25;
-var HealthPoints = 10;
-var FuelPoints = 10;
+var HealthPoints = 25;
+var FuelPoints = 25;
 
 var _class = function (_Phaser$State) {
     _inherits(_class, _Phaser$State);
@@ -5459,8 +5461,8 @@ var _class = function (_Phaser$State) {
                 this.makeExplosion(robot.body.centerX, robot.body.Y);
             }
 
-            this.player.health -= player.maxHealth / 4;
-            this.robots.remove(robot);
+            this.player.health -= 1;
+            robot.health -= 1;
         }
     }, {
         key: 'robotBulletCollidePlayerHandler',
@@ -5471,6 +5473,7 @@ var _class = function (_Phaser$State) {
     }, {
         key: 'missileHitsRobot',
         value: function missileHitsRobot(missile, robot) {
+            this.player.score += 100;
             robot.health -= 100;
             missile.kill();
             if (robot.health < 0) {
@@ -5500,6 +5503,7 @@ var _class = function (_Phaser$State) {
     }, {
         key: 'playerBulletCollideRobot',
         value: function playerBulletCollideRobot(bullet, robot) {
+            this.player.score += RobotPoints;
             robot.health -= 5;
             bullet.kill();
             if (robot.health < 0) {
@@ -5509,8 +5513,6 @@ var _class = function (_Phaser$State) {
                     this.makeExplosion(robot.body.centerX, robot.body.Y + robot.height);
                     this.makeExplosion(robot.body.centerX, robot.body.Y);
                 }
-
-                this.player.score += RobotPoints;
             }
         }
     }, {
@@ -5523,7 +5525,7 @@ var _class = function (_Phaser$State) {
             }
 
             this.asteroids.remove(asteroid);
-            this.robots.remove(robot);
+            robot.health -= 50;
         }
     }, {
         key: 'asteroidCollideOther',
@@ -5543,7 +5545,7 @@ var _class = function (_Phaser$State) {
     }, {
         key: 'playerCollideAsteroid',
         value: function playerCollideAsteroid(player, asteroid) {
-            this.player.health -= player.maxHealth / 10;
+            this.player.health -= 10;
             this.checkIfPlayerStillAlive();
 
             this.makeExplosion(asteroid.body.x, asteroid.body.y);
@@ -5737,15 +5739,9 @@ var _class = function (_Phaser$State) {
             game.time.events.add(4000, this.restartGame, this);
             var playerName = prompt("Enter your name for sending your score to " + API_URL);
             if (playerName) {
-                fetch(API_URL + '/submit_score', {
-                    // headers: {
-                    //   'Content-Type': 'application/json'
-                    // },
-                    method: "POST",
-                    body: JSON.stringify({
-                        player: playerName,
-                        points: this.player.score
-                    })
+                this.submitScore({
+                    player: playerName,
+                    points: this.player.score
                 });
             }
         }
@@ -5929,6 +5925,14 @@ var _class = function (_Phaser$State) {
             emitter2.start(false, 200, 1);
 
             this.rightRocket = emitter2;
+        }
+    }, {
+        key: 'submitScore',
+        value: function submitScore(body) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", API_URL + '/submit_score', true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(body));
         }
     }]);
 
