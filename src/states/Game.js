@@ -429,14 +429,14 @@ export default class extends Phaser.State {
         sun.animations.add('sun');
         sun.play('sun', 7, true, false);
 
-        console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
+        //console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
     }
 
     addFlag(nearObject) {
         var x = (nearObject.x > this.world.width/2 ? this.world.width*.9 : this.world.width*.1);
         var y = (nearObject.y > this.world.height/2 ? this.world.height*.9 : this.world.height*.1);
 
-        console.log("Adding flag.  x: " + x + ".  y: " + y);
+        //console.log("Adding flag.  x: " + x + ".  y: " + y);
 
         var newFlag = new Flag({
             game: this.game,
@@ -455,7 +455,7 @@ export default class extends Phaser.State {
     }
 
     addArrow(towardObject) {
-        console.log('creating arrow!')
+        //console.log('creating arrow!')
         var newArrow = new Arrow({
             game: this.game,
             x: this.player.x,
@@ -578,7 +578,7 @@ export default class extends Phaser.State {
 
             var asteroidRandom = Math.random();
             if (asteroidRandom < chanceOfAsteroid) {
-                console.log("Made an asteroid");
+                //console.log("Made an asteroid");
                 var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
                 var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
                 this.asteroids.add(newAsteroid);
@@ -596,7 +596,7 @@ export default class extends Phaser.State {
 
                 var robotRandom = Math.random();
                 if (robotRandom < chanceOfRobot) {
-                    console.log("Made a robot");
+                    //console.log("Made a robot");
                     var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
                     var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
 
@@ -628,7 +628,7 @@ export default class extends Phaser.State {
         }
 
         makeExplosion(x, y) {
-            console.log("Making explosion!");
+            //console.log("Making explosion!");
             var explosion = game.add.sprite(x, y, 'kaboom');
             explosion.anchor.x = 0.5;
             explosion.anchor.y = 0.5;
@@ -656,6 +656,9 @@ export default class extends Phaser.State {
 
         this.rightRocket.x = this.player.x;
         this.rightRocket.y = this.player.y;
+      } else {
+        this.leftRocket.setAlpha(0, 0, 300);
+        this.rightRocket.setAlpha(0, 0, 300);
       }
     }
 
