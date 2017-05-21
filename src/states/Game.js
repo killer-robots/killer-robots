@@ -11,12 +11,12 @@ import Arrow from '../sprites/Arrow'
 
 const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
 
-const FlagPoints = 250;
-const RobotPoints = 50;
+const FlagPoints = 500;
+const RobotPoints = 5;
 const CoinPoints = 50;
 const AsteroidPoints = 25;
-const HealthPoints = 10;
-const FuelPoints = 10;
+const HealthPoints = 25;
+const FuelPoints = 25;
 
 export default class extends Phaser.State {
     init () {}
@@ -290,8 +290,8 @@ export default class extends Phaser.State {
         )
       }
 
-      this.player.health -= player.maxHealth/4;
-        this.robots.remove(robot);
+      this.player.health -= 1;
+      robot.health -= 1;
     }
 
     robotBulletCollidePlayerHandler(player, bullet) {
@@ -300,6 +300,7 @@ export default class extends Phaser.State {
     }
 
     missileHitsRobot(missile, robot) {
+      this.player.score += 100
       robot.health -= 100
         missile.kill()
         if (robot.health < 0) {
@@ -331,6 +332,7 @@ export default class extends Phaser.State {
         // Robots are clever enough not to crash into each other.
     }
     playerBulletCollideRobot(bullet, robot) {
+        this.player.score += RobotPoints;
         robot.health -= 5
         bullet.kill()
         if (robot.health < 0) {
@@ -348,7 +350,7 @@ export default class extends Phaser.State {
           }
 
 
-          this.player.score += RobotPoints;
+
       }
     }
     asteroidCollideRobot(asteroid, robot) {
@@ -366,7 +368,7 @@ export default class extends Phaser.State {
       }
 
       this.asteroids.remove(asteroid);
-        this.robots.remove(robot);
+      robot.health -= 50;
     }
 
     asteroidCollideOther (asteroid, asteroid2) {
@@ -384,7 +386,7 @@ export default class extends Phaser.State {
     }
 
     playerCollideAsteroid (player, asteroid) {
-        this.player.health -= player.maxHealth / 10;
+        this.player.health -= 10;
         this.checkIfPlayerStillAlive();
 
         this.makeExplosion(asteroid.body.x, asteroid.body.y);
@@ -564,16 +566,10 @@ export default class extends Phaser.State {
 		game.time.events.add(4000, this.restartGame, this);
         const playerName = prompt("Enter your name for sending your score to " + API_URL)
         if (playerName) {
-          fetch(API_URL + '/submit_score', {
-            // headers: {
-            //   'Content-Type': 'application/json'
-            // },
-            method: "POST",
-            body: JSON.stringify({
-              player: playerName,
-              points: this.player.score
+            this.submitScore({
+                player: playerName,
+                points: this.player.score
             })
-          })
         }
 	}
 
@@ -754,4 +750,10 @@ export default class extends Phaser.State {
       this.rightRocket = emitter2;
     }
 
+    submitScore(body) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", API_URL + '/submit_score', true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(body));
+    }
 }
