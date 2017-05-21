@@ -235,6 +235,8 @@ export default class extends Phaser.State {
         game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
         game.physics.arcade.collide(this.specialWeapon1.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
         game.physics.arcade.collide(this.specialWeapon1.bullets, this.robots, this.playerBulletCollideRobot, null, this);
+        game.physics.arcade.collide(this.MissileGroup, this.robots, this.missileHitsRobot, null, this);
+        game.physics.arcade.collide(this.MissileGroup, this.asteroids, this.missileHitsAsteroid, null, this);
 
         //Self-collisions
         game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  null, this);
@@ -280,6 +282,21 @@ export default class extends Phaser.State {
     robotBulletCollidePlayerHandler(player, bullet) {
         this.player.health -= 1;
         bullet.kill()
+    }
+
+    missileHitsRobot(missile, robot) {
+        this.makeExplosion(robot.body.x, robot.body.y);
+        this.robots.remove(robot)
+        missile.kill()
+        this.player.score += RobotPoints;
+    }
+
+    missileHitsAsteroid(missile, asteroid) {
+        this.makeExplosion(asteroid.body.x, asteroid.body.y);
+        this.asteroids.remove(asteroid)
+        missile.kill()
+
+        this.player.score += AsteroidPoints;
     }
 
     robotCollideRobot(robot1, robot2) {
