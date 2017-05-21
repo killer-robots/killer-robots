@@ -65,11 +65,11 @@ export default class extends Phaser.Sprite {
     if (this.health <= 0)
     {
       if (this.bigRobot) {
-        this.makeExplosion(
+        this.game.makeExplosion(
           this.body.centerX,
           this.body.Y + this.height
         )
-        this.makeExplosion(
+        this.game.makeExplosion(
           this.body.centerX,
           this.body.Y
         )
