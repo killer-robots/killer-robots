@@ -9,6 +9,13 @@ import Sun from '../sprites/Sun'
 import Flag from '../sprites/Flag'
 import Arrow from '../sprites/Arrow'
 
+const FlagPoints = 250;
+const RobotPoints = 50;
+const CoinPoints = 50;
+const AsteroidPoints = 25;
+const HealthPoints = 10;
+const FuelPoints = 10;
+
 export default class extends Phaser.State {
   init () {}
   preload () {}
@@ -37,9 +44,6 @@ export default class extends Phaser.State {
     this.player.body.collideWorldBounds = true;
     game.camera.follow(this.player);
 
-    this.player.body.collideWorldBounds = true;
-    this.camera.follow(this.player);
-
     //Populate world with objects
     this.game.add.existing(this.background)
     this.asteroids = game.add.physicsGroup();
@@ -58,6 +62,14 @@ export default class extends Phaser.State {
     //Arrow to flag
     this.addArrow(flag);
 
+    //Load high score
+    var highScore = 0;
+    var loadScore = localStorage.getItem("killerRobotsHighScore");
+    if (loadScore !== null) {
+      highScore = parseInt(loadScore);
+    }
+    this.HighScore = highScore;
+
     //Add HUD info
     this.fuelText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var fuelTextImage = game.add.image(362, 35, this.fuelText)
@@ -71,6 +83,11 @@ export default class extends Phaser.State {
 
     this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var scoreTextImage = game.add.image(5, 5, this.scoreText)
+    scoreTextImage.tint = 0xFFD700
+    scoreTextImage.fixedToCamera = true
+
+    this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
     scoreTextImage.tint = 0xFFD700
     scoreTextImage.fixedToCamera = true
 
@@ -162,6 +179,8 @@ export default class extends Phaser.State {
       this.arrow.towards = this.addFlag(sun);
     }
     this.flags.remove(flag);
+
+    this.player.score += FlagPoints;
   }
 
   playerCollideRobot(player, robot) {
@@ -186,6 +205,7 @@ export default class extends Phaser.State {
   playerBulletCollideRobot(bullet, robot) {
     this.makeExplosion(robot.body.x, robot.body.y);
     this.robots.remove(robot);
+    this.player.score += RobotPoints;
   }
   asteroidCollideRobot(asteroid, robot) {
     this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
@@ -205,6 +225,7 @@ export default class extends Phaser.State {
     this.makeExplosion(asteroid.body.x, asteroid.body.y);
     this.asteroids.remove(asteroid);
     this.weapon.bullets.remove(bullet);
+    this.player.score += AsteroidPoints;
   }
 
   playerCollideAsteroid (player, asteroid) {
@@ -218,21 +239,23 @@ export default class extends Phaser.State {
   playerCollideCoin (player, coin) {
     //  If the ship collides with a coin it gets eaten :)
     this.coin1.play();
-    this.player.score += 1;
+    this.player.score += CoinPoints;
     coin.kill();
   }
-    playerCollideFuel (player, fuel) {
-        //  If the ship collides with a coin it gets eaten :)
-        this.fuel1.play();
-        this.player.fuel += 200000;
-        fuel.kill();
-    }
-    playerCollideMedpack (player, medpack) {
-        //  If the ship collides with a coin it gets eaten :)
-        this.med1.play();
-        this.player.health += 25;
-        medpack.kill();
-    }
+  playerCollideFuel (player, fuel) {
+      //  If the ship collides with a coin it gets eaten :)
+      this.fuel1.play();
+      this.player.fuel += 200000;
+      fuel.kill();
+    this.player.score += FuelPoints;
+  }
+  playerCollideMedpack (player, medpack) {
+      //  If the ship collides with a coin it gets eaten :)
+      this.med1.play();
+      this.player.health += 25;
+      medpack.kill();
+      this.player.score += HealthPoints;
+  }
 
   checkIfPlayerStillAlive() {
     if (this.player.health <= 0) {
@@ -367,6 +390,12 @@ export default class extends Phaser.State {
     this.drawBar(600, y + 30, this.player.fuel / this.player.fuelMax)
 
     this.scoreText.text = 'score ' + this.player.score
+
+    if (this.player.score > this.HighScore)
+    {
+      this.HighScore = this.player.score;
+    }
+    this.highScoreText.text = 'high ' + this.HighScore;
   }
 
   addCoin() {
