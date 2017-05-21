@@ -595,9 +595,12 @@ export default class extends Phaser.State {
 
                 var robotRandom = Math.random();
                 if (robotRandom < chanceOfRobot) {
+
+                    //var assetName = (robotRandom < chanceOfRobot/10 ? 'big-robot' : 'robot');
+                  var assetName = 'big-robot'
                     //console.log("Made a robot");
                     var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
-                    var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
+                    var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: assetName});
 
                     this.robots.add(newRobot);
                 }

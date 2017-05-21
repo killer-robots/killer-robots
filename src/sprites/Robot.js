@@ -25,7 +25,14 @@ export default class extends Phaser.Sprite {
 
     var randomAngle = Math.atan2(speedY, speedX) / (Math.PI / 180)
     this.body.velocity = new Phaser.Point(speedX, speedY)
-    this.body.setCircle(10, 0, 0);
+
+    if (asset == 'robot') {
+      this.body.mass = 2
+      this.body.setCircle(10, 0, 0);
+    } else {
+      this.body.mass = 10
+      this.body.setSize(105,169);
+    }
 
     this.anchor.setTo(0.5)
     this.firerate = firerateMax
@@ -34,7 +41,7 @@ export default class extends Phaser.Sprite {
     this.outOfBoundsKill = true;
     this.health = 100;
     this.alpha = 1;
-    this.body.mass = 2
+
   }
 
   update () {
