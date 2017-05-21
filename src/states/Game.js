@@ -326,16 +326,14 @@ export default class extends Phaser.State {
         coin.kill();
     }
     playerCollideFuel (player, fuel) {
-        //  If the ship collides with a coin it gets eaten :)
         this.powerupSound.play();
-        this.player.fuel += 200000;
+        this.player.fuel = Math.min(this.player.fuelMax, this.player.fuel + 500000);
         fuel.kill();
         this.player.score += FuelPoints;
     }
     playerCollideMedpack (player, medpack) {
-        //  If the ship collides with a coin it gets eaten :)
         this.powerupSound.play();
-        this.player.health += 25;
+        this.player.health = Math.min(this.player.maxHealth, this.player.health + 50);
         medpack.kill();
         this.player.score += HealthPoints;
     }
