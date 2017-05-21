@@ -25,7 +25,7 @@ export default class extends Phaser.Sprite {
 
   update () {
       this.fireRate -= 1
-      if (this.firerate < 0) {
+      if (this.firerate < 0 && this.health > 0) {
         if (game.input.keyboard.isDown(Phaser.Keyboard.X)) {
           this.game.missile1.play();
           var missile = new Bullet({
