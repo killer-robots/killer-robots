@@ -422,17 +422,17 @@ export default class extends Phaser.State {
         }
         this.highScoreText.text = 'high ' + this.HighScore;
         this.scoreText.text = 'score ' + this.player.score
-        if (this.player === null || this.player.health == 0)
+        if (this.player === null || this.player.health == 0 || this.player.alpha == 0)
         {
             localStorage.setItem("killerRobotsHighScore", this.HighScore);
             this.gameOverText.text = 'You died!\nGame Over'
-            game.time.events.add(5000, this.restartGame, this);
+            game.time.events.add(4000, this.restartGame, this);
         }
         if (this.player.fuel == 0)
         {
             localStorage.setItem("killerRobotsHighScore", this.HighScore);
             this.gameOverText.text = 'You are out of fuel!'
-            game.time.events.add(5000, this.restartGame, this);
+            game.time.events.add(4000, this.restartGame, this);
 
         }
     }
