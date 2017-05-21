@@ -41,6 +41,7 @@ export default class extends Phaser.State {
             y: this.world.centerY,
             asset: 'ship'
         })
+
         this.player.body.collideWorldBounds = true;
         game.camera.follow(this.player);
 
@@ -53,7 +54,6 @@ export default class extends Phaser.State {
         this.flags = game.add.physicsGroup();
         this.addSun()
         this.game.add.existing(this.player);
-
         //Starting flag
         var sun = this.game.suns[0];
         var flag = this.addFlag(sun);
@@ -94,21 +94,20 @@ export default class extends Phaser.State {
         highScoreTextImage.fixedToCamera = true
 
         // options/pause menu text
-        var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-        this.optionsTextImage = game.add.image(5, 362, optionsText)
-        this.optionsTextImage.texture.text = 'pause'
-        this.optionsTextImage.tint = 0xFFFFFF
-        this.optionsTextImage.fixedToCamera = true
-        this.optionsTextImage.inputEnabled = true
-        this.asdf = undefined
-        this.optionsTextImage.events.onInputDown.add(() => {
-          game.paused = !game.paused
-          if (game.paused) {
-            this.optionsTextImage.texture.text = 'unpause'
-          } else {
-            this.optionsTextImage.texture.text = 'pause'
-          }
-        })
+        // var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+        // this.optionsTextImage = game.add.image(5, 362, optionsText)
+        // this.optionsTextImage.texture.text = 'pause'
+        // this.optionsTextImage.tint = 0xFFFFFF
+        // this.optionsTextImage.fixedToCamera = true
+        // this.optionsTextImage.inputEnabled = true
+        // this.optionsTextImage.events.onInputDown.add(() => {
+        //   game.paused = !game.paused
+        //   if (game.paused) {
+        //     this.optionsTextImage.texture.text = 'unpause'
+        //   } else {
+        //     this.optionsTextImage.texture.text = 'pause'
+        //   }
+        // })
 
         //game over text
         this.gameOverText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
@@ -177,6 +176,8 @@ export default class extends Phaser.State {
         this.barGraphics = game.add.graphics(0, 0)
         this.barGraphics.fixedToCamera = true
 
+        this.createRocketEmitters();
+
         // Audio
         this.missile1 = game.add.audio('missile1')
         this.laser1 = game.add.audio('laser1');
@@ -192,6 +193,8 @@ export default class extends Phaser.State {
     }
 
     update() {
+
+      this.updateRockets();
         if (!this.musics[this.currentSongIndex].isPlaying) {
           // Play next song.
           this.currentSongIndex = (this.currentSongIndex + 1) % this.musics.length;
@@ -425,14 +428,14 @@ export default class extends Phaser.State {
         sun.animations.add('sun');
         sun.play('sun', 7, true, false);
 
-        console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
+        //console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
     }
 
     addFlag(nearObject) {
         var x = (nearObject.x > this.world.width/2 ? this.world.width*.9 : this.world.width*.1);
         var y = (nearObject.y > this.world.height/2 ? this.world.height*.9 : this.world.height*.1);
 
-        console.log("Adding flag.  x: " + x + ".  y: " + y);
+        //console.log("Adding flag.  x: " + x + ".  y: " + y);
 
         var newFlag = new Flag({
             game: this.game,
@@ -451,7 +454,7 @@ export default class extends Phaser.State {
     }
 
     addArrow(towardObject) {
-        console.log('creating arrow!')
+        //console.log('creating arrow!')
         var newArrow = new Arrow({
             game: this.game,
             x: this.player.x,
@@ -500,20 +503,14 @@ export default class extends Phaser.State {
         }
         this.highScoreText.text = 'high ' + this.HighScore;
         this.scoreText.text = 'score ' + this.player.score
-        if (this.player === null || this.player.health == 0 || this.player.alpha == 0)
-        {
-            localStorage.setItem("killerRobotsHighScore", this.HighScore);
-            this.gameOverText.text = 'You died!\nGame Over'
-            game.time.events.add(4000, this.restartGame, this);
-        }
-        if (this.player.fuel == 0)
-        {
-            localStorage.setItem("killerRobotsHighScore", this.HighScore);
-            this.gameOverText.text = 'You are out of fuel!'
-            game.time.events.add(4000, this.restartGame, this);
-
-        }
     }
+	
+	notifyPlayerDied(message) {
+		console.log("Player died")
+		localStorage.setItem("killerRobotsHighScore", this.HighScore);
+		this.gameOverText.text = message
+		game.time.events.add(4000, this.restartGame, this);
+	}
 
     restartGame() {
         this.game.state.start("Game");
@@ -580,7 +577,7 @@ export default class extends Phaser.State {
 
             var asteroidRandom = Math.random();
             if (asteroidRandom < chanceOfAsteroid) {
-                console.log("Made an asteroid");
+                //console.log("Made an asteroid");
                 var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
                 var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
                 this.asteroids.add(newAsteroid);
@@ -598,7 +595,7 @@ export default class extends Phaser.State {
 
                 var robotRandom = Math.random();
                 if (robotRandom < chanceOfRobot) {
-                    console.log("Made a robot");
+                    //console.log("Made a robot");
                     var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
                     var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
 
@@ -630,7 +627,7 @@ export default class extends Phaser.State {
         }
 
         makeExplosion(x, y) {
-            console.log("Making explosion!");
+            //console.log("Making explosion!");
             var explosion = game.add.sprite(x, y, 'kaboom');
             explosion.anchor.x = 0.5;
             explosion.anchor.y = 0.5;
@@ -639,4 +636,54 @@ export default class extends Phaser.State {
 
             this.explosion1.play();
         }
+
+    updateRockets() {
+      if (this.player != null && this.player.body != null) {
+        var acc = this.player.body.acceleration.getMagnitude();
+
+        if (acc > 0) {
+          this.leftRocket.setAlpha(1, 0, 300);
+          this.rightRocket.setAlpha(1, 0, 300);
+        }
+        else {
+          this.leftRocket.setAlpha(0, 0, 300);
+          this.rightRocket.setAlpha(0, 0, 300);
+        }
+
+        this.leftRocket.x = this.player.x;
+        this.leftRocket.y = this.player.y;
+
+        this.rightRocket.x = this.player.x;
+        this.rightRocket.y = this.player.y;
+      } else {
+        this.leftRocket.setAlpha(0, 0, 300);
+        this.rightRocket.setAlpha(0, 0, 300);
+      }
     }
+
+    createRocketEmitters() {
+      var emitter = this.game.add.emitter(0, 0, 800);
+
+      emitter.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
+      //emitter.particleAnchor = new Phaser.Point(0.1,0.9);
+      emitter.setAlpha(1, 0, 30);
+      emitter.setScale(0.1, 0, 0.1, 0, 300);
+      emitter.start(false, 200, 1);
+
+      //this.player.addChild(emitter);
+      this.leftRocket = emitter;
+
+      var emitter2 = this.game.add.emitter(0, 0, 800);
+
+      emitter2.makeParticles( [ 'fire1', 'fire2', 'fire3', 'smoke' ] );
+      //emitter2.particleAnchor = new Phaser.Point(0.9,0.9);
+      emitter2.setAlpha(1, 0, 30);
+      emitter2.setScale(0.1, 0, 0.1, 0, 300);
+
+      //this.player.addChild(emitter2);
+      emitter2.start(false, 200, 1);
+
+      this.rightRocket = emitter2;
+    }
+
+}

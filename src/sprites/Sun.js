@@ -7,7 +7,7 @@ export default class extends Phaser.Sprite {
     this.scale.setTo(0.8)
     game.physics.enable(this, Phaser.Physics.ARCADE)
     this.gravity = 10
-    this.gravityRadius = 50000
+    this.gravityRadius = 20000
     this.eventHorizonRadius = 10000
   }
 
