@@ -32,13 +32,13 @@ export default class extends Phaser.Sprite {
       this.body.mass = 2
       this.body.setCircle(10, 0, 0);
       this.bigRobot = false;
-      console.log("small robot made");
+      //console.log("small robot made");
     } else {
       this.health = 300;
       this.body.mass = 10
       this.body.setSize(105,169);
       this.bigRobot = true;
-      console.log("big robot made");
+      //console.log("big robot made");
     }
 
     this.anchor.setTo(0.5)
