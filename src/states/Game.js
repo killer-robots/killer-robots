@@ -455,7 +455,9 @@ export default class extends Phaser.State {
 
 
   addRobot() {
-    if (this.robots.total < 5) {
+    var maxRobots = this.player.score / 10;
+
+    if (this.robots.total < maxRobots) {
       var chanceOfRobot = 0.1;
 
       var robotRandom = Math.random();
