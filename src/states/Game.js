@@ -134,9 +134,7 @@ export default class extends Phaser.State {
         this.laser2 = game.add.audio('laser2');
         this.explosion1 = game.add.audio('explosion1');
         this.coin1 = game.add.audio('coin1');
-        this.fuel1 = game.add.audio('fuel1');
-
-        this.med1 = game.add.audio('med1');
+        this.powerupSound = game.add.audio('powerupSound', 0.5);
         this.spaceWind = game.add.audio('spaceWind', 0.5, true);
         this.musics = [game.add.audio('mars', 0.5, true)];
 
@@ -269,14 +267,14 @@ export default class extends Phaser.State {
     }
     playerCollideFuel (player, fuel) {
         //  If the ship collides with a coin it gets eaten :)
-        this.fuel1.play();
+        this.powerupSound.play();
         this.player.fuel += 200000;
         fuel.kill();
         this.player.score += FuelPoints;
     }
     playerCollideMedpack (player, medpack) {
         //  If the ship collides with a coin it gets eaten :)
-        this.med1.play();
+        this.powerupSound.play();
         this.player.health += 25;
         medpack.kill();
         this.player.score += HealthPoints;

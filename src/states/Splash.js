@@ -41,6 +41,7 @@ export default class extends Phaser.State {
     game.load.audio('explosion1', 'assets/audio/explosion1.wav')
     game.load.audio('coin1', 'assets/audio/coin1.wav')
     game.load.audio('spaceWind', 'assets/audio/space-wind.wav')
+    game.load.audio('powerupSound', 'assets/audio/powerup.wav')
     game.load.audio('mars', 'assets/audio/music/Mars.wav')
   }
 
