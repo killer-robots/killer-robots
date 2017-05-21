@@ -277,8 +277,18 @@ export default class extends Phaser.State {
             (player.body.x + robot.body.x) / 2,
             (player.body.y + robot.body.y) / 2
         );
+      if (robot.bigRobot) {
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y + robot.height
+        )
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y
+        )
+      }
 
-        this.player.health -= player.maxHealth/4;
+      this.player.health -= player.maxHealth/4;
         this.robots.remove(robot);
     }
 
@@ -293,7 +303,18 @@ export default class extends Phaser.State {
         if (robot.health < 0) {
             this.makeExplosion(robot.body.x, robot.body.y);
             this.robots.remove(robot)
-            this.player.score += RobotPoints;
+          if (robot.bigRobot) {
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y + robot.height
+            )
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y
+            )
+          }
+
+          this.player.score += RobotPoints;
         }
     }
 
@@ -313,13 +334,36 @@ export default class extends Phaser.State {
         if (robot.health < 0) {
           this.makeExplosion(robot.body.x, robot.body.y);
           this.robots.remove(robot);
+          if (robot.bigRobot) {
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y + robot.height
+            )
+            this.makeExplosion(
+              robot.body.centerX,
+              robot.body.Y
+            )
+          }
+
+
           this.player.score += RobotPoints;
-    }
+      }
     }
     asteroidCollideRobot(asteroid, robot) {
         this.makeExplosion(((asteroid.body.x + robot.body.x) / 2),
             (asteroid.body.y + robot.body.y) / 2);
-        this.asteroids.remove(asteroid);
+      if (robot.bigRobot) {
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y + robot.height
+        )
+        this.makeExplosion(
+          robot.body.centerX,
+          robot.body.Y
+        )
+      }
+
+      this.asteroids.remove(asteroid);
         this.robots.remove(robot);
     }
 
@@ -602,8 +646,8 @@ export default class extends Phaser.State {
                 var robotRandom = Math.random();
                 if (robotRandom < chanceOfRobot) {
 
-                    //var assetName = (robotRandom < chanceOfRobot/10 ? 'big-robot' : 'robot');
-                  var assetName = 'big-robot'
+                    var assetName = (robotRandom < chanceOfRobot/10 ? 'big-robot' : 'robot');
+                  //var assetName = 'big-robot'
                     //console.log("Made a robot");
                     var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
                     var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: assetName});

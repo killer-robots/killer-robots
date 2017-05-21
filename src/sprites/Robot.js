@@ -30,9 +30,11 @@ export default class extends Phaser.Sprite {
     if (asset == 'robot') {
       this.body.mass = 2
       this.body.setCircle(10, 0, 0);
+      this.bigRobot = false;
     } else {
       this.body.mass = 10
       this.body.setSize(105,169);
+      this.bigRobot = true;
     }
 
     this.anchor.setTo(0.5)
