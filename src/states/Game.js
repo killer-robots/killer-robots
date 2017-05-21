@@ -94,21 +94,20 @@ export default class extends Phaser.State {
         highScoreTextImage.fixedToCamera = true
 
         // options/pause menu text
-        var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
-        this.optionsTextImage = game.add.image(5, 362, optionsText)
-        this.optionsTextImage.texture.text = 'pause'
-        this.optionsTextImage.tint = 0xFFFFFF
-        this.optionsTextImage.fixedToCamera = true
-        this.optionsTextImage.inputEnabled = true
-        this.asdf = undefined
-        this.optionsTextImage.events.onInputDown.add(() => {
-          game.paused = !game.paused
-          if (game.paused) {
-            this.optionsTextImage.texture.text = 'unpause'
-          } else {
-            this.optionsTextImage.texture.text = 'pause'
-          }
-        })
+        // var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+        // this.optionsTextImage = game.add.image(5, 362, optionsText)
+        // this.optionsTextImage.texture.text = 'pause'
+        // this.optionsTextImage.tint = 0xFFFFFF
+        // this.optionsTextImage.fixedToCamera = true
+        // this.optionsTextImage.inputEnabled = true
+        // this.optionsTextImage.events.onInputDown.add(() => {
+        //   game.paused = !game.paused
+        //   if (game.paused) {
+        //     this.optionsTextImage.texture.text = 'unpause'
+        //   } else {
+        //     this.optionsTextImage.texture.text = 'pause'
+        //   }
+        // })
 
         //game over text
         this.gameOverText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)

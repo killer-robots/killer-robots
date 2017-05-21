@@ -19,6 +19,7 @@ export default class extends Phaser.State {
     this.load.image('ship', 'assets/images/ship.png')
     this.load.image('asteroid', 'assets/images/asteroid.png')
     this.load.image('robot', 'assets/images/ufo.png')
+    this.load.image('big-robot', 'assets/images/big_robot.png')
     this.load.image('bullet', 'assets/images/bullet.png')
     this.load.image('bullet', 'assets/images/bullet.png')
     this.load.image('green-bullet', 'assets/images/green-bullet.png')
