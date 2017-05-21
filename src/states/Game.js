@@ -93,9 +93,9 @@ export default class extends Phaser.State {
 
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
-    this.weapon.bulletLifespan = 500;
+    this.weapon.bulletLifespan = 1000;
     this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-    this.weapon.bulletSpeed = 700;
+    this.weapon.bulletSpeed = 750;
     this.weapon.fireRate = 100;
     this.weapon.trackSprite(this.player, 0, 0, true);
     var shootSignal = new Phaser.Signal();
