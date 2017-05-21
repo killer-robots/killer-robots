@@ -75,22 +75,31 @@ export default class extends Phaser.State {
     var fuelTextImage = game.add.image(362, 35, this.fuelText)
     fuelTextImage.tint = 0xFF7766
     fuelTextImage.fixedToCamera = true
-
+	
+	//health text
     this.healthText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var healthTextImage = game.add.image(362, 5, this.healthText)
     healthTextImage.tint = 0x28bb35
     healthTextImage.fixedToCamera = true
-
+	
+	//score text
     this.scoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var scoreTextImage = game.add.image(5, 5, this.scoreText)
     scoreTextImage.tint = 0xFFD700
     scoreTextImage.fixedToCamera = true
-
+	
+	//high score text
     this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
     var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
     scoreTextImage.tint = 0xFFD700
     scoreTextImage.fixedToCamera = true
-
+	
+	//game over text
+	this.gameOverText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+    var gameOverTextImage = game.add.image(game.camera.width/8, game.camera.height/2, this.gameOverText)
+    gameOverTextImage.tint = 0xD80000
+    gameOverTextImage.fixedToCamera = true
+	
     // Set up a weapon
     this.weapon = game.add.weapon(50, 'bullet')
     this.weapon.bulletLifespan = 500;
@@ -131,11 +140,11 @@ export default class extends Phaser.State {
     //Add objects
     this.addAsteroid();
     this.addRobot();
-	  this.addCoin();
-	  this.addFuel();
-	  this.addMedpack();
+	this.addCoin();
+	this.addFuel();
+	this.addMedpack();
 
-	  //Check for firing input
+	//Check for firing input
     if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
       this.weapon.fire();
     }
@@ -396,6 +405,21 @@ export default class extends Phaser.State {
       this.HighScore = this.player.score;
     }
     this.highScoreText.text = 'high ' + this.HighScore;
+	this.scoreText.text = 'score ' + this.player.score
+	if (this.player.health == 0) {
+      //TODO:  End game
+	  console.log(this.player.x)
+	console.log(this.player.y)
+	  console.log('game over health 0')
+	  this.gameOverText.text = 'You died!\nGame Over'
+    }
+	if (this.player.fuel == 0) {
+      //TODO:  End game
+	  console.log('game over fuel 0')
+	  console.log(this.player.x)
+		console.log(this.player.y)
+	  this.gameOverText.text = 'You are out of fuel!'
+    }
   }
 
   addCoin() {
