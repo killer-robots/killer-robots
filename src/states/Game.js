@@ -31,7 +31,7 @@ export default class extends Phaser.State {
         //Setup the world
         var worldWidth = 4096;
         var worldHeight = 4096;
-        this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
+        this.background = game.add.tileSprite(0, 0, worldWidth, worldHeight, 'background')
 
         //Setup the player
         this.world.setBounds(0,0,worldWidth,worldHeight);
@@ -45,7 +45,6 @@ export default class extends Phaser.State {
         game.camera.follow(this.player);
 
         //Populate world with objects
-        this.game.add.existing(this.background)
         this.asteroids = game.add.physicsGroup();
         this.robots = game.add.physicsGroup();
         this.coins = game.add.physicsGroup();
@@ -94,6 +93,18 @@ export default class extends Phaser.State {
 
         scoreTextImage.tint = 0xFFD700
         scoreTextImage.fixedToCamera = true
+
+        // options/pause menu text
+        this.optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+        // this.optionsText.text = 'options'
+        this.optionsText.text = 'pause'
+        var optionsTextImage = game.add.image(5, 362, this.optionsText)
+        optionsTextImage.tint = 0xFFFFFF
+        optionsTextImage.fixedToCamera = true
+        optionsTextImage.inputEnabled = true
+        optionsTextImage.events.onInputDown.add(() => {
+          game.paused = !game.paused
+        })
 
         //game over text
         this.gameOverText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
