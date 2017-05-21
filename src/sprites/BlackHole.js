@@ -16,7 +16,7 @@ export default class extends Phaser.Sprite {
   }
 
   applyGravityTo(object) {
-    if (object !== null) {
+    if (object !== null && object.body !== null) {
       var distance = new Phaser.Point(this.body.center.x - object.body.center.x, this.body.center.y - object.body.center.y)
       var distMagSq = distance.getMagnitudeSq()
       if (distMagSq < this.gravityRadius) {

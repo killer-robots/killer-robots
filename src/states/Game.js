@@ -166,6 +166,12 @@ export default class extends Phaser.State {
 
     //player flag collision
     game.physics.arcade.collide(this.player, this.flags, this.playerCollideFlag, null, this);
+
+    if (this.player === null || this.player.health == 0)
+    {
+      localStorage.setItem("killerRobotsHighScore", this.HighScore);
+      this.restartGame()
+    }
   }
 
   playerCollideFlag(player, flag) {
@@ -391,6 +397,10 @@ export default class extends Phaser.State {
       this.HighScore = this.player.score;
     }
     this.highScoreText.text = 'high ' + this.HighScore;
+  }
+
+  restartGame() {
+    this.game.state.start("Game");
   }
 
   addCoin() {

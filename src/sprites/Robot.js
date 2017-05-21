@@ -58,26 +58,30 @@ export default class extends Phaser.Sprite {
       this.destroy();
     }
     else {
-      if (this.playerIsNearby()) {
-        // Move towards the player.
-        this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
+      try {
+        if (this.playerIsNearby()) {
+          // Move towards the player.
+          this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
 
-        // Try to shoot the player.
-        if (this.firerate < 0) {
-          this.game.laser2.play();
-          var newBullet = new Bullet({
-            game: this.game,
-            x: this.body.center.x,
-            y: this.body.center.y,
-            asset: 'green-bullet',
-            rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
-          })
-          this.game.add.existing(newBullet)
-          this.firerate = firerateMax;
+          // Try to shoot the player.
+          if (this.firerate < 0) {
+            this.game.laser2.play();
+            var newBullet = new Bullet({
+              game: this.game,
+              x: this.body.center.x,
+              y: this.body.center.y,
+              asset: 'green-bullet',
+              rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
+            })
+            this.game.add.existing(newBullet)
+            this.firerate = firerateMax;
+          }
         }
-      }
 
-      this.firerate -= 1
+        this.firerate -= 1
+      } catch(err) {
+        //player is likely dead
+      }
     }
 
   }
