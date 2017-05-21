@@ -28,6 +28,8 @@ export default class extends Phaser.State {
     this.load.image('green-bullet', 'assets/images/green-bullet.png')
     this.load.image('fuel','assets/images/gas.png' )
     this.load.image('medpack','assets/images/medpack.png' )
+    this.load.image('weapon1','assets/images/weapon1.png' )
+      this.load.image('missile','assets/images/missile.png' )
 
     for (let planet of planets) {
       this.load.image(planet, 'assets/images/planets/' + planet + '.png')
@@ -41,7 +43,12 @@ export default class extends Phaser.State {
     game.load.audio('explosion1', 'assets/audio/explosion1.wav')
     game.load.audio('coin1', 'assets/audio/coin1.wav')
     game.load.audio('spaceWind', 'assets/audio/space-wind.wav')
+    game.load.audio('powerupSound', 'assets/audio/powerup.wav')
+    game.load.audio('missile1', 'assets/audio/missile.wav')
     game.load.audio('mars', 'assets/audio/music/Mars.wav')
+    game.load.audio('venus', 'assets/audio/music/Venus.wav')
+    game.load.audio('mercury', 'assets/audio/music/Mercury.wav')
+    game.load.audio('map', 'assets/audio/music/Map.wav')
   }
 
   create () {

@@ -31,7 +31,7 @@ export default class extends Phaser.State {
         //Setup the world
         var worldWidth = 4096;
         var worldHeight = 4096;
-        this.background = new Phaser.TileSprite(game, 0, 0, worldWidth, worldHeight, 'background')
+        this.background = game.add.tileSprite(0, 0, worldWidth, worldHeight, 'background')
 
         //Setup the player
         this.world.setBounds(0,0,worldWidth,worldHeight);
@@ -46,7 +46,6 @@ export default class extends Phaser.State {
         game.camera.follow(this.player);
 
         //Populate world with objects
-        this.game.add.existing(this.background)
         this.asteroids = game.add.physicsGroup();
         this.robots = game.add.physicsGroup();
         this.coins = game.add.physicsGroup();
@@ -91,9 +90,25 @@ export default class extends Phaser.State {
         //high score text
         this.highScoreText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
         var highScoreTextImage = game.add.image(5, 35, this.highScoreText)
+        highScoreTextImage.tint = 0xFF9905
+        highScoreTextImage.fixedToCamera = true
 
-        scoreTextImage.tint = 0xFFD700
-        scoreTextImage.fixedToCamera = true
+        // options/pause menu text
+        var optionsText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
+        this.optionsTextImage = game.add.image(5, 362, optionsText)
+        this.optionsTextImage.texture.text = 'pause'
+        this.optionsTextImage.tint = 0xFFFFFF
+        this.optionsTextImage.fixedToCamera = true
+        this.optionsTextImage.inputEnabled = true
+        this.asdf = undefined
+        this.optionsTextImage.events.onInputDown.add(() => {
+          game.paused = !game.paused
+          if (game.paused) {
+            this.optionsTextImage.texture.text = 'unpause'
+          } else {
+            this.optionsTextImage.texture.text = 'pause'
+          }
+        })
 
         //game over text
         this.gameOverText = game.add.retroFont('knightHawks', 31, 25, Phaser.RetroFont.TEXT_SET2, 10, 1, 0)
@@ -101,61 +116,99 @@ export default class extends Phaser.State {
         gameOverTextImage.tint = 0xD80000
         gameOverTextImage.fixedToCamera = true
 
-
         highScoreTextImage.tint = 0xFF9905
         highScoreTextImage.fixedToCamera = true
 
-
-        // Set up a weapon
+        // Set up the default weapon
         this.weapon = game.add.weapon(50, 'bullet')
         this.weapon.bulletLifespan = 1000;
         this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-
-            this.weapon.bulletSpeed = 1200
+        this.weapon.bulletSpeed = 750;
         this.weapon.fireRate = 100;
         this.weapon.trackSprite(this.player, 0, 0, true);
+        this.weapon.actualFire = function(shooter, weapon) {
+          weapon.fire(shooter);
+        };
         var shootSignal = new Phaser.Signal();
         shootSignal.add(function() {
-            this.laser1.play();
+          this.laser1.play();
         }, this);
         this.weapon.onFire = shootSignal;
+        var defaultWeapon = this.weapon;
+        this.player.currentWeapon = defaultWeapon;
+
+        // Set up the special weapon #1
+        this.specialWeapon1 = game.add.weapon(50, 'bullet')
+        this.specialWeapon1.bulletLifespan = 1000;
+        this.specialWeapon1.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
+        this.specialWeapon1.bulletSpeed = 750;
+        this.specialWeapon1.fireRate = 100;
+        this.specialWeapon1.trackSprite(this.player, 0, 0, true);
+        this.specialWeapon1.actualFire = function(shooter, weapon) {
+          if (weapon.game.time.time < weapon.nextFire) { return; }
+          var c = Math.cos(shooter.angle * (Math.PI / 180));
+          var s = Math.sin(shooter.angle * (Math.PI / 180));
+          var firerateBackup = weapon.fireRate;
+          weapon.fireRate = 0;
+          var spread = 0.2;
+
+          for (var dir = -2; dir <= 2; dir++) {
+            weapon.fire(shooter, shooter.position.x + (c + spread * dir) % (Math.PI * 2),
+                                 shooter.position.y + (s - spread * dir) % (Math.PI * 2));
+          }
+
+          weapon.fireRate = firerateBackup;
+          weapon.nextFire = weapon.game.time.time + weapon.fireRate;
+          weapon.shotsLeft--;
+          if (weapon.shotsLeft <= 0) {
+            shooter.currentWeapon = defaultWeapon; // Set default weapon back.
+          }
+        };
+        this.specialWeapon1.onFire = shootSignal;
 
         this.robotWeaponGroup = this.game.add.physicsGroup();
 
         this.CoinGroup = this.game.add.physicsGroup();
         this.FuelGroup = this.game.add.physicsGroup();
         this.MedpackGroup = this.game.add.physicsGroup();
+        this.WeaponGroup = this.game.add.physicsGroup();
+        this.MissileGroup = this.game.add.physicsGroup();
 
         this.barGraphics = game.add.graphics(0, 0)
         this.barGraphics.fixedToCamera = true
 
         // Audio
+        this.missile1 = game.add.audio('missile1')
         this.laser1 = game.add.audio('laser1');
         this.laser2 = game.add.audio('laser2');
         this.explosion1 = game.add.audio('explosion1');
         this.coin1 = game.add.audio('coin1');
-        this.fuel1 = game.add.audio('fuel1');
-
-        this.med1 = game.add.audio('med1');
+        this.powerupSound = game.add.audio('powerupSound', 0.5);
         this.spaceWind = game.add.audio('spaceWind', 0.5, true);
-        this.musics = [game.add.audio('mars', 0.5, true)];
-
-        this.musics[0].play();
-
+        this.musics = [game.add.audio('mars', 0.5), game.add.audio('mercury', 0.5),
+                       game.add.audio('venus', 0.5), game.add.audio('map', 0.5)];
+        this.currentSongIndex = 0;
+        this.musics[this.currentSongIndex].play();
     }
 
-
     update() {
+        if (!this.musics[this.currentSongIndex].isPlaying) {
+          // Play next song.
+          this.currentSongIndex = (this.currentSongIndex + 1) % this.musics.length;
+          this.musics[this.currentSongIndex].play();
+        }
+
         //Add objects
         this.addAsteroid();
         this.addRobot();
         this.addCoin();
         this.addFuel();
         this.addMedpack();
+        this.addWeapons();
 
         //Check for firing input
         if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-            this.weapon.fire();
+            this.player.currentWeapon.actualFire(this.player, this.player.currentWeapon);
         }
 
         //Coin collection
@@ -167,6 +220,11 @@ export default class extends Phaser.State {
         //Health collision
         game.physics.arcade.overlap(this.player, this.MedpackGroup, this.playerCollideMedpack, null, this);
 
+        //Weapons collision
+        game.physics.arcade.overlap(this.player, this.WeaponGroup, this.playerCollideWeapon, null, this);
+        // This doesn't probably work yet:
+        // game.physics.arcade.overlap(this.robots, this.WeaponGroup, this.playerCollideWeapon, null, this);
+
         //Player collisions
         game.physics.arcade.collide(this.player, this.asteroids, this.playerCollideAsteroid, null, this);
         game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
@@ -175,6 +233,10 @@ export default class extends Phaser.State {
         //console.log("Bullets:" + this.weapon.bullets.total);
         game.physics.arcade.collide(this.weapon.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
         game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
+        game.physics.arcade.collide(this.specialWeapon1.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
+        game.physics.arcade.collide(this.specialWeapon1.bullets, this.robots, this.playerBulletCollideRobot, null, this);
+        game.physics.arcade.collide(this.MissileGroup, this.robots, this.missileHitsRobot, null, this);
+        game.physics.arcade.collide(this.MissileGroup, this.asteroids, this.missileHitsAsteroid, null, this);
 
         //Self-collisions
         game.physics.arcade.collideGroupVsSelf(this.asteroids, this.asteroidCollideOther,  null, this);
@@ -188,8 +250,6 @@ export default class extends Phaser.State {
 
             //robots shoot
             game.physics.arcade.collide(this.robotWeaponGroup, this.player, this.robotBulletCollidePlayerHandler, null, this);
-
-
     }
 
     playerCollideFlag(player, flag) {
@@ -222,6 +282,21 @@ export default class extends Phaser.State {
     robotBulletCollidePlayerHandler(player, bullet) {
         this.player.health -= 1;
         bullet.kill()
+    }
+
+    missileHitsRobot(missile, robot) {
+        this.makeExplosion(robot.body.x, robot.body.y);
+        this.robots.remove(robot)
+        missile.kill()
+        this.player.score += RobotPoints;
+    }
+
+    missileHitsAsteroid(missile, asteroid) {
+        this.makeExplosion(asteroid.body.x, asteroid.body.y);
+        this.asteroids.remove(asteroid)
+        missile.kill()
+
+        this.player.score += AsteroidPoints;
     }
 
     robotCollideRobot(robot1, robot2) {
@@ -268,18 +343,22 @@ export default class extends Phaser.State {
         coin.kill();
     }
     playerCollideFuel (player, fuel) {
-        //  If the ship collides with a coin it gets eaten :)
-        this.fuel1.play();
-        this.player.fuel += 200000;
+        this.powerupSound.play();
+        this.player.fuel = Math.min(this.player.fuelMax, this.player.fuel + 500000);
         fuel.kill();
         this.player.score += FuelPoints;
     }
     playerCollideMedpack (player, medpack) {
-        //  If the ship collides with a coin it gets eaten :)
-        this.med1.play();
-        this.player.health += 25;
+        this.powerupSound.play();
+        this.player.health = Math.min(this.player.maxHealth, this.player.health + 50);
         medpack.kill();
         this.player.score += HealthPoints;
+    }
+    playerCollideWeapon (player, weaponCrate) {
+        this.powerupSound.play();
+        weaponCrate.kill();
+        this.player.currentWeapon = this.specialWeapon1;
+        this.specialWeapon1.shotsLeft = 100;
     }
 
     checkIfPlayerStillAlive() {
@@ -347,7 +426,6 @@ export default class extends Phaser.State {
         sun.play('sun', 7, true, false);
 
         console.log("Adding sun.  x: " + sun.x + ".  y: " + sun.y);
-
     }
 
     addFlag(nearObject) {
@@ -472,6 +550,18 @@ export default class extends Phaser.State {
                 var xPos = this.world.width * Math.random();
                 var yPos = this.world.width * Math.random();
                 var newMedpack = this.MedpackGroup.create(xPos, yPos, 'medpack');
+            }
+        }
+    }
+
+    addWeapons() {
+        if (this.WeaponGroup.total < 5) {
+            var chanceOfFuel = .1;
+            var fuelRandom = Math.random();
+            if (fuelRandom < chanceOfFuel) {
+                var xPos = this.world.width * Math.random();
+                var yPos = this.world.width * Math.random();
+                var newFuel = this.WeaponGroup.create(xPos, yPos, 'weapon1');
             }
         }
     }
