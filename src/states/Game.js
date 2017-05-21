@@ -110,11 +110,8 @@ export default class extends Phaser.State {
         this.weapon = game.add.weapon(50, 'bullet')
         this.weapon.bulletLifespan = 1000;
         this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-    <<<<<<< HEAD
-        this.weapon.bulletSpeed = 750;
-    =======
-            this.weapon.bulletSpeed = 1300
-                >>>>>>> alien2
+
+            this.weapon.bulletSpeed = 1200
         this.weapon.fireRate = 100;
         this.weapon.trackSprite(this.player, 0, 0, true);
         var shootSignal = new Phaser.Signal();
@@ -191,6 +188,7 @@ export default class extends Phaser.State {
 
             //robots shoot
             game.physics.arcade.collide(this.robotWeaponGroup, this.player, this.robotBulletCollidePlayerHandler, null, this);
+
 
     }
 
@@ -485,7 +483,9 @@ export default class extends Phaser.State {
     }
 
     addAsteroid() {
-        if (this.asteroids.total < 100) {
+
+      var maxAsteroids = 50 + (this.player.score / 500)
+        if (this.asteroids.total < maxAsteroids) {
             var chanceOfAsteroid = 0.1;
 
             var asteroidRandom = Math.random();
@@ -500,14 +500,10 @@ export default class extends Phaser.State {
 
 
     addRobot() {
-
-        var maxRobots = this.player.score / 10;
+        var maxRobots = 25 + (this.player.score / 500);
 
         if (this.robots.total < maxRobots) {
             var chanceOfRobot = 0.1;
-
-            if (this.robots.total < 50) {
-                var chanceOfRobot = .1;
 
 
                 var robotRandom = Math.random();
