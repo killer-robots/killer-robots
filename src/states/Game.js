@@ -153,7 +153,7 @@ export default class extends Phaser.State {
     game.physics.arcade.collide(this.player, this.robots, this.playerCollideRobot, null, this);
 
     //Bullets
-    console.log("Bullets:" + this.weapon.bullets.total);
+    //console.log("Bullets:" + this.weapon.bullets.total);
     game.physics.arcade.collide(this.weapon.bullets, this.asteroids, this.bulletCollideAsteroidHandler, null, this);
     game.physics.arcade.collide(this.weapon.bullets, this.robots, this.playerBulletCollideRobot, null, this);
 
@@ -446,6 +446,7 @@ export default class extends Phaser.State {
 
       var asteroidRandom = Math.random();
       if (asteroidRandom < chanceOfAsteroid) {
+        console.log("Made an asteroid");
         var newPosition = this.getPositionAlongEdge(asteroidRandom, chanceOfAsteroid);
         var newAsteroid = new Asteroid({game: this, x: newPosition.x, y: newPosition.y, asset: 'asteroid'});
         this.asteroids.add(newAsteroid);
@@ -460,6 +461,7 @@ export default class extends Phaser.State {
 
       var robotRandom = Math.random();
       if (robotRandom < chanceOfRobot) {
+        console.log("Made a robot");
         var newPosition = this.getPositionAlongEdge(robotRandom, chanceOfRobot);
         var newRobot = new Robot({game: this, x: newPosition.x, y: newPosition.y, asset: 'robot'});
         this.robots.add(newRobot);
@@ -490,6 +492,7 @@ export default class extends Phaser.State {
   }
 
   makeExplosion(x, y) {
+    console.log("Making explosion!");
     var explosion = game.add.sprite(x, y, 'kaboom');
     explosion.anchor.x = 0.5;
     explosion.anchor.y = 0.5;

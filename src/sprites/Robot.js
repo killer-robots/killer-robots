@@ -31,30 +31,12 @@ export default class extends Phaser.Sprite {
     this.body.bounce.set(1);
 
     this.outOfBoundsKill = true;
+    this.health = 100;
+    this.alpha = 1;
+    this.body.mass = 2
   }
 
   update () {
-    if (this.playerIsNearby()) {
-      // Move towards the player.
-      this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
-
-      // Try to shoot the player.
-      if (this.firerate < 0) {
-        this.game.laser2.play();
-        var newBullet = new Bullet({
-          game: this.game,
-          x: this.body.center.x,
-          y: this.body.center.y,
-          asset: 'green-bullet',
-          rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
-        })
-        this.game.add.existing(newBullet)
-        this.firerate = firerateMax;
-      }
-    }
-
-    this.firerate -= 1
-
     this.body.gravity.set(0, 0) // Reset and recalculate below.
     for (let planet of game.planets) {
       planet.applyGravityTo(this)
@@ -62,6 +44,42 @@ export default class extends Phaser.Sprite {
     for (let blackHole of game.blackHoles) {
       blackHole.applyGravityTo(this)
     }
+    for (let sun of game.suns) {
+      sun.applyGravityTo(this)
+    }
+
+    if (this.health == 0)
+    {
+      this.game.makeExplosion(this.x, this.y);
+    }
+    if (this.alpha == 0 || this.health == 0 )
+    {
+      console.log("asteroid destroyed!\nAlpha: " + this.alpha + "\nHealth: " +this.health);
+      this.destroy();
+    }
+    else {
+      if (this.playerIsNearby()) {
+        // Move towards the player.
+        this.body.velocity = Phaser.Point.subtract(this.game.player.body.center, this.body.center)
+
+        // Try to shoot the player.
+        if (this.firerate < 0) {
+          this.game.laser2.play();
+          var newBullet = new Bullet({
+            game: this.game,
+            x: this.body.center.x,
+            y: this.body.center.y,
+            asset: 'green-bullet',
+            rotation: Phaser.Point.angle(this.game.player.body.center, this.body.center)
+          })
+          this.game.add.existing(newBullet)
+          this.firerate = firerateMax;
+        }
+      }
+
+      this.firerate -= 1
+    }
+
   }
 
   playerIsNearby() {
