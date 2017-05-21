@@ -9,6 +9,8 @@ import Sun from '../sprites/Sun'
 import Flag from '../sprites/Flag'
 import Arrow from '../sprites/Arrow'
 
+import config from '../config'
+
 const API_URL = 'https://killer-robots-highscore-server.herokuapp.com'
 
 const FlagPoints = 500;
@@ -191,13 +193,18 @@ export default class extends Phaser.State {
         this.musics = [game.add.audio('mars', 0.5), game.add.audio('mercury', 0.5),
                        game.add.audio('venus', 0.5), game.add.audio('map', 0.5)];
         this.currentSongIndex = game.rnd.integerInRange(0, this.musics.length - 1);
-        this.musics[this.currentSongIndex].play();
+    }
+
+    shutdown() {
+      for (var music of this.musics) {
+        music.stop();
+      }
     }
 
     update() {
 
       this.updateRockets();
-        if (!this.musics[this.currentSongIndex].isPlaying) {
+        if (!this.musics[this.currentSongIndex].isPlaying && !this.musics[this.currentSongIndex].isDecoding) {
           // Play next song.
           this.currentSongIndex = (this.currentSongIndex + 1) % this.musics.length;
           this.musics[this.currentSongIndex].play();
@@ -503,10 +510,12 @@ export default class extends Phaser.State {
 		localStorage.setItem("killerRobotsHighScore", this.HighScore);
 		this.gameOverText.text = message
 		game.time.events.add(4000, this.restartGame, this);
-        const playerName = prompt("Enter your name for sending your score to " + API_URL)
-        if (playerName) {
+        if (!config.PLAYER.NAME) {
+            config.PLAYER.NAME = prompt("Enter your name for sending your score to " + API_URL)
+        }
+        if (config.PLAYER.NAME) {
             this.submitScore({
-                player: playerName,
+                player: config.PLAYER.NAME,
                 points: this.player.score
             })
         }

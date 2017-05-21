@@ -4,6 +4,8 @@
 
 > Shit this is better than drugs - Anonymous
 
+Highscore server: https://killer-robots-highscore-server.herokuapp.com
+
 It was bootstrapped with [Phaser+ES6+Webpack](https://github.com/lean/phaser-es6-webpack)
 
 To try it out first you should have Node.js installed, then run `npm install` and `npm run dev` from the root of this repository.
