@@ -291,7 +291,7 @@ export default class extends Phaser.State {
       }
 
       this.player.health -= player.maxHealth/4;
-        this.robots.remove(robot);
+      robot.health -= 100;
     }
 
     robotBulletCollidePlayerHandler(player, bullet) {
@@ -366,7 +366,7 @@ export default class extends Phaser.State {
       }
 
       this.asteroids.remove(asteroid);
-        this.robots.remove(robot);
+      robot.health -= 100;
     }
 
     asteroidCollideOther (asteroid, asteroid2) {
